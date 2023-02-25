@@ -1,4 +1,5 @@
-# IRL Trust -- dao lending pool that uses in-real-life trust between people to give credit
+# IRL Trust 
+dao lending pool that uses in-real-life trust between people to give credit
 
 # Original post:
 a micro-lending pool of people that personally know the borrower

@@ -32,14 +32,14 @@ User flow
 2. B asks for a loan from her friends and family. By doing that, B puts her reputation at stake. 
 3. These IRL Lenders form a dao
 4.B creates a proposal that has the terms
-  a. Amount
-  b. Downpayment
-  c. Withdrawals (initial $40 for the sewing machine, $20 every week for textiles, and $5 for other expenses; for two months)
-    i. When (includes start and end day)
-    ii. How much
-    iii. To which addresses (seller of the sewing machine, textile suppliers, and other expenses)
-    iv. Interest (included in the payments)
-  d. Repayments: when and how much  (withdrawals end + 2 months to build capital, start repaying, specify dates and amounts)
+    a. Amount
+    b. Downpayment
+    c. Withdrawals (initial $40 for the sewing machine, $20 every week for textiles, and $5 for other expenses; for two months)
+        i. When (includes start and end day)
+        ii. How much
+        iii. To which addresses (seller of the sewing machine, textile suppliers, and other expenses)
+        iv. Interest (included in the payments)
+    d. Repayments: when and how much  (withdrawals end + 2 months to build capital, start repaying, specify dates and amounts)
 5. Dao votes and approves the terms
 6. Loan starts
 7. If all repayments are according to the schedule, no problem –the dao emits an event.

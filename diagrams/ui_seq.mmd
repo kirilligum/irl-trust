@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant b
+    participant l1
+    participant l2
+    participant p
+    b->>b: create proposal url
+    b-)l1: proposal url
+    b-)l2: proposal url
+    l1-)b: request to join the proposal
+    l2-)b: request to join the proposal
+    b->>l1: approve request for proposal
+    b->>l2: approve request for proposal
+    l1->>p: send funds
+    l2->>p: send funds
+    Note over p: lending starts
+    p->>b: withdrawls
+    b->>p: repay
+    p-)l1: principal+interest
+    p-)l2: principal+interest

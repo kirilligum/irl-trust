@@ -60,8 +60,8 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
     _poolConfig = BasePoolConfig(poolConfigAddr);
     _updateCoreData();
 
-    for (uint i=0; i <= lenders.length;i++) {
-      addApprovedLender(lenders[i]);
+    for (uint i=0; i < lenders.length;i++) {
+      _approvedLenders[lenders[i]] = true;
     }
     _approvedBorrower = borrower;
     // note approve max amount to pool config for admins to withdraw their rewards

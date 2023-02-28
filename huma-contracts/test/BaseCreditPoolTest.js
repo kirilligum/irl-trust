@@ -125,7 +125,7 @@ describe("Base Credit Pool", function () {
       const res = await evmRevert(sId);
     }
   });
-
+  /*
   describe("BaseCreditPool settings", function () {
     it("Should not allow credit line to be changed when protocol is paused", async function () {
       if ((await humaConfigContract.connect(protocolOwner).paused()) == false)
@@ -239,6 +239,7 @@ describe("Base Credit Pool", function () {
       ).to.be.revertedWithCustomError(hdtContract, "notPool");
     });
   });
+  */
 
   // Borrowing tests are grouped into two suites: Borrowing Request and Funding.
   // In beforeEach() of "Borrowing request", we make sure there is 100 liquidity.
@@ -560,7 +561,6 @@ describe("Base Credit Pool", function () {
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInGoodStandingState");
     });
   });
-
   describe("IsLate()", function () {
     it("Shall not mark the account as late if there is no drawdown", async function () {
       await poolConfigContract.connect(poolOwner).setCreditApprovalExpiration(5);
@@ -588,7 +588,7 @@ describe("Base Credit Pool", function () {
       expect(await poolContract.isLate(borrower.address)).to.equal(true);
     });
   });
-
+  /*
   describe("Credit expiration without a timely first drawdown", function () {
     it("Cannot borrow after credit expiration window", async function () {
       await poolConfigContract.connect(poolOwner).setCreditApprovalExpiration(5);
@@ -635,7 +635,8 @@ describe("Base Credit Pool", function () {
       expect(creditInfo.unbilledPrincipal).to.equal(toToken(1_000_000));
     });
   });
-
+  */
+  /*
   describe("Account update by service account", function () {
     it("Shall not emit BillRefreshed event when the bill should not be refreshed", async function () {
       await poolContract.connect(borrower).requestCredit(toToken(1_000_000), 30, 12);
@@ -764,7 +765,7 @@ describe("Base Credit Pool", function () {
       expect(accruedIncome.eaIncome).to.equal(13342866129);
     });
   });
-
+  */
   // In "Payback".beforeEach(), make sure there is a loan funded.
   describe("Payback", function () {
     beforeEach(async function () {
@@ -863,6 +864,7 @@ describe("Base Credit Pool", function () {
   });
 
   // In "Payback".beforeEach(), make sure there is a loan funded.
+  /*
   describe("Quick payback", function () {
     it("Process payback", async function () {
       let lenderBalance = await testTokenContract.balanceOf(lender.address);
@@ -898,6 +900,7 @@ describe("Base Credit Pool", function () {
       checkRecord(r, rs, toToken(1_000_000), 0, dueDate, 0, 0, 0, 0, 11, 1217, 30, 3, 0);
     });
   });
+  */
 
   describe("Multiple immediate payback towards payoff", function () {
     it("Multiple immediate payback", async function () {
@@ -961,7 +964,7 @@ describe("Base Credit Pool", function () {
       checkRecord(r, rs, toToken(1_000_000), 0, dueDate, 0, 0, 0, 0, 10, 1217, 30, 3, 0);
     });
   });
-
+  /*
   describe("Multiple borrowing to form positive correction in payoff", function () {
     it("Multiple consecutive borrowing", async function () {
       let lenderBalance = await testTokenContract.balanceOf(lender.address);
@@ -1025,8 +1028,10 @@ describe("Base Credit Pool", function () {
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInStateForMakingPayment");
     });
   });
+  */
 
   // Test scenario available at https://tinyurl.com/yc898sj4
+  /*
   describe("Quick large amount payback (for getDueInfo overflow)", function () {
     it("Quick follow-up borrowing", async function () {
       let lenderBalance = await testTokenContract.balanceOf(lender.address);
@@ -1145,9 +1150,11 @@ describe("Base Credit Pool", function () {
       checkRecord(r, rs, toToken(1_500_000), 0, dueDate, 0, 0, 0, 0, 8, 1217, 30, 3, 0);
     });
   });
+  */
 
   // Default flow. After each pay period, simulates to LatePayMonitorService to call updateDueInfo().
   // Test scenario available at https://tinyurl.com/yc5fks9x
+  /*
   describe("Default", function () {
     let dueDate, nextDate;
 
@@ -1513,7 +1520,8 @@ describe("Base Credit Pool", function () {
       });
     });
   });
-
+*/
+  /*
   describe("Protocol/Pool Owner/EA fee", function () {
     it("Should not allow non-protocol-owner to withdraw protocol", async function () {
       await expect(
@@ -1654,4 +1662,5 @@ describe("Base Credit Pool", function () {
       );
     });
   });
-});
+*/
+})

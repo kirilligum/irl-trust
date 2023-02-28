@@ -86,6 +86,11 @@
   },
   {
     "inputs": [],
+    "name": "maxRepayInPeriodExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "onlyBorrowerOrEACanReduceCreditLine",
     "type": "error"
   },

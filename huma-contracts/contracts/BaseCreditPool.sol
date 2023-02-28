@@ -451,6 +451,7 @@ return losses;
 
       uint256 currentTermAmount = _maxWithdrawInSchedule[0];
       if (borrowAmount > _maxWithdrawInSchedule[0]) revert Errors.creditInPeriodExceeded();
+      _maxWithdrawInSchedule[0] -= borrowAmount;
     }
 
     /**
@@ -776,7 +777,7 @@ return losses;
       uint256 amount
     ) internal {
       if (block.timestamp > _maxRepaySchedule[0]) {
-        if(_maxWInSchedule[0] > 0) {
+        if(_maxRepayInSchedule[0] > 0) {
           _maxRepayInSchedule[1] += _maxRepayInSchedule[0];
         }
 
@@ -790,6 +791,7 @@ return losses;
 
       uint256 currentTermAmount = _maxWithdrawInSchedule[0];
       if ( amount > _maxWithdrawInSchedule[0]) revert Errors.maxRepayInPeriodExceeded();
+      _maxWithdrawInSchedule[0] -= amount;
 
     }
 

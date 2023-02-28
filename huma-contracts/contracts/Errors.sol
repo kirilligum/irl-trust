@@ -55,7 +55,7 @@ contract Errors {
     error creditLineNotInStateForMakingPayment(); // 0xf023e48b
     error creditLineNotInStateForDrawdown(); // 0x4ff95a6d
     error creditLineExceeded(); // 0xef7d66ff
-    error creditLineExceeded(); // Function Signature not yet calculated
+    error creditInPeriodExceeded(); // Function Signature not yet calculated
     error creditLineAlreadyExists(); // 0x6c5805f2
     error creditLineGreatThanUpperLimit(); // 0xd8c27d2f
     error greaterThanMaxCreditLine(); // 0x8a754ae8

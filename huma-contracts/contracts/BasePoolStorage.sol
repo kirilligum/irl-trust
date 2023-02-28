@@ -55,10 +55,10 @@ contract BasePoolStorage {
     uint256[100] private __gap;
 
     // withdrawSchedule.length = maxWithdrawInSchedule.length
-    uint256[] _withdrawSchedule;
+    uint256[] _maxWithdrawSchedule;
     uint256[] _maxWithdrawInSchedule;
     // maxRepaySchedule.length = maxRepayInSchedule.length
     uint256[] _maxRepaySchedule;
-    uint256[] _maxRepayinSchedule;
+    uint256[] _maxRepayInSchedule;
 
 }

@@ -2,11 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "creditLimit",
         "type": "uint256"
@@ -35,11 +30,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "newLine",
         "type": "uint256"
@@ -66,11 +56,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "numOfPeriods",
         "type": "uint256"
@@ -82,13 +67,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isApproved",
     "outputs": [
       {
@@ -101,13 +80,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isDefaultReady",
     "outputs": [
       {
@@ -120,13 +93,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isLate",
     "outputs": [
       {
@@ -140,11 +107,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "_amount",
@@ -168,13 +130,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "refreshAccount",
     "outputs": [
       {
@@ -252,13 +208,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "triggerDefault",
     "outputs": [
       {

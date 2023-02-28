@@ -28,6 +28,23 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     OverwrittenByNewLine
   }
 
+    /**
+     * @notice Credit line created
+     * @param borrower the address of the borrower
+     * @param creditLimit the credit limit of the credit line
+     * @param aprInBps interest rate (APR) expressed in basis points, 1% is 100, 100% is 10000
+     * @param payPeriodInDays the number of days in each pay cycle
+     * @param remainingPeriods how many cycles are there before the credit line expires
+     * @param approved flag that shows if the credit line has been approved or not
+     */
+    event CreditInitiated(
+        address indexed borrower,
+        uint256 creditLimit,
+        uint256 aprInBps,
+        uint256 payPeriodInDays,
+        uint256 remainingPeriods,
+        bool approved
+    );
   /// Account billing info refreshed with the updated due amount and date
   event BillRefreshed(address indexed _approvedBorrower, uint256 newDueDate, address by);
   /// Credit line request has been approved
@@ -39,23 +56,6 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     uint256 aprInBps
   );
 
-  /**
-  * @notice Credit line created
-  * @param borrower the address of the borrower
-  * @param creditLimit the credit limit of the credit line
-  * @param aprInBps interest rate (APR) expressed in basis points, 1% is 100, 100% is 10000
-  * @param payPeriodInDays the number of days in each pay cycle
-  * @param remainingPeriods how many cycles are there before the credit line expires
-  * @param approved flag that shows if the credit line has been approved or not
-   */
-  event CreditInitiated(
-      address indexed borrower,
-      uint256 creditLimit,
-      uint256 aprInBps,
-      uint256 payPeriodInDays,
-      uint256 remainingPeriods,
-      bool approved
-      );
   /// Credit limit for an existing credit line has been changed
   event CreditLineChanged(
       address indexed borrower,
@@ -74,7 +74,6 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   );
   /**
   * @notice The expiration (maturity) date of a credit line has been extended.
-  * @param borrower the address of the borrower
   * @param numOfPeriods the number of pay periods to be extended
   * @param remainingPeriods the remaining number of pay periods after the extension
   */
@@ -86,14 +85,12 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   );
   /**
   * @notice The credit line has been marked as Defaulted.
-  * @param borrower the address of the borrower
   * @param losses the total losses to be written off because of the default.
     * @param by the address who has triggered the default
   */
   event DefaultTriggered(address indexed borrower, uint256 losses, address by);
   /**
   * @notice A borrowing event has happened to the credit line
-  * @param borrower the address of the borrower
   * @param borrowAmount the amount the user has borrowed
   * @param netAmountToBorrower the borrowing amount minus the fees that are charged upfront
   */
@@ -104,7 +101,6 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   );
   /**
   * @notice A payment has been made against the credit line
-  * @param borrower the address of the borrower
   * @param amount the payback amount
   * @param by the address that has triggered the process of marking the payment made.
     * In most cases, it is the borrower. In receivable factoring, it is PDSServiceAccount.
@@ -119,7 +115,6 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
 
   /**
   * @notice Approves the credit request with the terms provided.
-  * @param borrower the address of the borrower
   * @param creditLimit the credit limit of the credit line
   * @param intervalInDays the number of days in each pay cycle
   * @param remainingPeriods how many cycles are there before the credit line expires
@@ -150,7 +145,6 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
 
   /**
   * @notice changes the limit of the borrower's credit line.
-  * @param borrower the owner of the credit line
   * @param newCreditLimit the new limit of the line in the unit of pool token
   * @dev The credit line is marked as Deleted if 1) the new credit line is 0 AND
     * 2) there is no due or unbilled principals.
@@ -175,7 +169,7 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     // Mark the line as Deleted when there is no due or unbilled principal
     if (newCreditLimit == 0) {
       // Bring the account current
-      BS.CreditRecord memory cr = _updateDueInfo(_approvedBorrower, false, true);
+      BS.CreditRecord memory cr = _updateDueInfo(false, true);
       // Note: updated state and remainingPeriods directly instead of the entire cr
       // for contract size consideration
       if (cr.totalDue == 0 && cr.unbilledPrincipal == 0) {
@@ -202,14 +196,13 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     if (borrowAmount == 0) revert Errors.zeroAmountProvided();
     BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
 
-  _checkDrawdownEligibility(_approvedBorrower, cr, borrowAmount);
-  uint256 netAmountToBorrower = _drawdown(_approvedBorrower, cr, borrowAmount);
+  _checkDrawdownEligibility( cr, borrowAmount);
+  uint256 netAmountToBorrower = _drawdown(cr, borrowAmount);
   emit DrawdownMade(_approvedBorrower, borrowAmount, netAmountToBorrower);
 }
 
 /**
 * @notice The expiration (maturity) date of a credit line has been extended.
-* @param borrower the address of the borrower
 * @param numOfPeriods the number of pay periods to be extended
  */
 function extendCreditLineDuration(uint256 numOfPeriods)
@@ -221,7 +214,7 @@ function extendCreditLineDuration(uint256 numOfPeriods)
   // Although it is not essential to call _updateDueInfo() to extend the credit line duration
   // it is good practice to bring the account current while we update one of the fields.
   // Also, only if we call _updateDueInfo(), we can write proper tests.
-  _updateDueInfo(_approvedBorrower, false, true);
+  _updateDueInfo(false, true);
   _creditRecordMapping[_approvedBorrower].remainingPeriods += uint16(numOfPeriods);
   emit CreditLineExtended(
       _approvedBorrower,
@@ -249,7 +242,7 @@ returns (uint256 amountPaid, bool paidoff)
 {
   if (msg.sender != _approvedBorrower) onlyPDSServiceAccount();
 
-  (amountPaid, paidoff, ) = _makePayment(_approvedBorrower, amount, BS.PaymentStatus.NotReceived);
+  (amountPaid, paidoff, ) = _makePayment( amount, BS.PaymentStatus.NotReceived);
 }
 
 /**
@@ -270,8 +263,8 @@ override
 returns (BS.CreditRecord memory cr)
 {
   if (_creditRecordMapping[_approvedBorrower].state != BS.CreditState.Defaulted) {
-    if (isDefaultReady(_approvedBorrower)) return _updateDueInfo(_approvedBorrower, false, false);
-    else return _updateDueInfo(_approvedBorrower, false, true);
+    if (isDefaultReady()) return _updateDueInfo( false, false);
+    else return _updateDueInfo( false, true);
   }
 }
 
@@ -288,7 +281,6 @@ uint256 numOfPayments
 ) external virtual override {
   // Open access to the borrower. Data validation happens in _initiateCredit()
   _initiateCredit(
-    msg.sender,
     creditLimit,
     _poolConfig.poolAprInBps(),
     intervalInDays,
@@ -297,6 +289,10 @@ uint256 numOfPayments
   );
 }
 
+/**
+ * @notice initiation of a credit line
+ * @param creditLimit the amount of the liquidity asset that the borrower obtains
+ */
 /**
 * @notice Triggers the default process
 * @return losses the amount of remaining losses to the pool
@@ -312,13 +308,13 @@ BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
 if (cr.state == BS.CreditState.Defaulted) revert Errors.defaultHasAlreadyBeenTriggered();
 
 if (block.timestamp > cr.dueDate) {
-  cr = _updateDueInfo(_approvedBorrower, false, false);
+  cr = _updateDueInfo( false, false);
 }
 
 // Check if grace period has exceeded. Please note it takes a full pay period
 // before the account is considered to be late. The time passed should be one pay period
 // plus the grace period.
-if (!isDefaultReady(_approvedBorrower)) revert Errors.defaultTriggeredTooEarly();
+if (!isDefaultReady()) revert Errors.defaultTriggeredTooEarly();
 
 // default amount includes all outstanding principals
 losses = cr.unbilledPrincipal + cr.totalDue - cr.feesAndInterestDue;
@@ -414,7 +410,7 @@ return losses;
     function _checkDrawdownEligibility(
       BS.CreditRecord memory cr,
       uint256 borrowAmount
-    ) internal view {
+    ) internal  {
       _protocolAndPoolOn();
 
       if (cr.state != BS.CreditState.GoodStanding && cr.state != BS.CreditState.Approved)
@@ -445,20 +441,20 @@ return losses;
           _maxWithdrawInSchedule[1] += _maxWithdrawInSchedule[0];
         }
 
-        for (uint i = index; i<_maxWithdrawSchedule.length-1; i++){
+        for (uint i = 0; i<_maxWithdrawSchedule.length-1; i++){
             _maxWithdrawSchedule[i] = _maxWithdrawSchedule[i+1];
             _maxWithdrawInSchedule[i] = _maxWithdrawInSchedule[i+1];
         }
-        _maxWithdrawSchedule.length--;
-        _maxWithdrawInSchedule.length--;
+        _maxWithdrawSchedule.pop();
+        _maxWithdrawInSchedule.pop();
       }
+
       uint256 currentTermAmount = _maxWithdrawInSchedule[0];
       if (borrowAmount > _maxWithdrawInSchedule[0]) revert Errors.creditInPeriodExceeded();
     }
 
     /**
     * @notice helper function for drawdown
-    * @param borrower the borrower
     * @param borrowAmount the amount to borrow
     */
     function _drawdown(
@@ -472,7 +468,7 @@ return losses;
 
         // Generates the first bill
         // Note: the interest is calculated at the beginning of each pay period
-        cr = _updateDueInfo(_approvedBorrower, true, true);
+        cr = _updateDueInfo( true, true);
 
         // Set account status in good standing
         cr.state = BS.CreditState.GoodStanding;
@@ -480,7 +476,7 @@ return losses;
         // Return drawdown flow
         // Bring the account current.
         if (block.timestamp > cr.dueDate) {
-          cr = _updateDueInfo(_approvedBorrower, false, true);
+          cr = _updateDueInfo(false, true);
           if (cr.state != BS.CreditState.GoodStanding)
             revert Errors.creditLineNotInGoodStandingState();
         }
@@ -532,7 +528,6 @@ return losses;
 
     /**
      * @notice initiation of a credit line
-     * @param borrower the address of the borrower
      * @param creditLimit the amount of the liquidity asset that the borrower obtains
      */
     function _initiateCredit(
@@ -551,7 +546,7 @@ return losses;
       if (cr.state != BS.CreditState.Deleted) {
         // If the user has an existing line, but there is no balance, close the old one
         // and initiate the new one automatically.
-        cr = _updateDueInfo(_approvedBorrower, false, true);
+        cr = _updateDueInfo( false, true);
         if (cr.totalDue == 0 && cr.unbilledPrincipal == 0) {
           cr.state = BS.CreditState.Deleted;
           cr.remainingPeriods = 0;
@@ -598,7 +593,6 @@ return losses;
     /**
     * @notice Borrower makes one payment. If this is the final payment,
     * it automatically triggers the payoff process.
-      * @param borrower the address of the borrower
     * @param amount the payment amount
     * @param paymentStatus a flag that indicates the status the payment.
       * Ideally, two boolean parameters (isPaymentReceived, isPaymentVerified) are used
@@ -645,7 +639,7 @@ return losses;
       if (block.timestamp > cr.dueDate) {
         // Bring the account current. This is necessary since the account might have been dormant for
         // several cycles.
-        cr = _updateDueInfo(_approvedBorrower, false, true);
+        cr = _updateDueInfo(false, true);
       }
 
       // Computes the final payoff amount. Needs to consider the correction associated with
@@ -723,14 +717,14 @@ return losses;
         // Recovers funds to the pool if the account is Defaulted.
         // Only moves it to GoodStanding only after payoff, handled in the payoff branch
         if (cr.state == BS.CreditState.Defaulted)
-          _recoverDefaultedAmount(_approvedBorrower, amountToCollect);
+          _recoverDefaultedAmount(amountToCollect);
       } else {
         // Payoff logic
         principalPayment = cr.unbilledPrincipal + cr.totalDue - cr.feesAndInterestDue;
         amountToCollect = payoffAmount;
 
         if (cr.state == BS.CreditState.Defaulted) {
-          _recoverDefaultedAmount(_approvedBorrower, amountToCollect);
+          _recoverDefaultedAmount( amountToCollect);
         } else {
           // Distribut or reverse income to consume outstanding correction.
           // Positive correction is generated because of a drawdown within this period.
@@ -816,7 +810,6 @@ return losses;
     * @dev this is used in both makePayment() and drawdown() to bring the account current
     * @dev getDueInfo() gets the due information of the most current cycle. This function
     * updates the record in creditRecordMapping for `_borrower`
-      * @param borrower the address of the borrwoer
     * @param isFirstDrawdown whether this request is for the first drawdown of the credit line
       * @param distributeChargesForLastCycle whether to distribute income to different parties
     * (protocol, poolOwner, EA, and the pool). A `false` value is used in special cases
@@ -883,7 +876,7 @@ return losses;
     }
 
     /// Shared setter to the credit record mapping for contract size consideration
-    function _setCreditRecord(BS.CreditRecord memory cr) internal {
+    function _setCreditRecord(address borrower, BS.CreditRecord memory cr) internal {
       _creditRecordMapping[_approvedBorrower] = cr;
     }
 

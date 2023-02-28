@@ -320,6 +320,36 @@
         "internalType": "address",
         "name": "poolConfigAddr",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "lenders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxWithdrawSchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxWithdrawInSchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepaySchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepayInSchedule",
+        "type": "uint256[]"
       }
     ],
     "name": "initialize",

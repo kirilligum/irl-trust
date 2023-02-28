@@ -6,7 +6,6 @@ pragma solidity ^0.8.0;
  */
 interface IReceivable {
     /**
-     * @param _borrower the borrower address
      * @param _creditLimit the limit of the credit
      * @param _receivableAsset the receivable asset used for this credit
      * @param _receivableParam additional parameter of the receivable asset, e.g. NFT tokenid
@@ -15,7 +14,6 @@ interface IReceivable {
      * @param _remainingPeriods the number of pay periods for this credit
      */
     function approveCredit(
-        address _borrower,
         uint256 _creditLimit,
         uint256 _intervalInDays,
         uint256 _remainingPeriods,
@@ -30,7 +28,6 @@ interface IReceivable {
      * other than the borrower wallet
      */
     function onReceivedPayment(
-        address borrower,
         uint256 amount,
         bytes32 paymentIdHash
     ) external;
@@ -47,4 +44,5 @@ interface IReceivable {
         address receivableAsset,
         uint256 receivableParam
     ) external;
+
 }

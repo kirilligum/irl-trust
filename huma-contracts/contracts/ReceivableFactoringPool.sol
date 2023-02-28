@@ -49,7 +49,6 @@ contract ReceivableFactoringPool is
      * @notice After the EA (EvalutionAgent) has approved a factoring, it calls this function
      * to record the approval on chain and mark as factoring as approved, which will enable
      * the borrower to drawdown (borrow) from the approved credit.
-     * @param borrower the borrower address
      * @param creditLimit the limit of the credit
      * @param receivableAsset the receivable asset used for this credit
      * @param receivableParam additional parameter of the receivable asset, e.g. NFT tokenid
@@ -74,23 +73,22 @@ contract ReceivableFactoringPool is
         // Populates fields related to receivable
         if (receivableAsset == address(0)) revert Errors.zeroAddressProvided();
 
-        _setReceivableInfo(_approvedBorrower, receivableAsset, receivableParam, receivableAmount);
+        _setReceivableInfo( receivableAsset, receivableParam, receivableAmount);
 
         // Pool status and data validation happens within initiate().
-        _initiateCredit(_approvedBorrower, creditLimit, aprInBps, intervalInDays, remainingPeriods, true);
+        _initiateCredit( creditLimit, aprInBps, intervalInDays, remainingPeriods, true);
     }
 
     /**
      * @notice changes the limit of the borrower's credit line.
      * @dev The credit line is marked as Deleted if 1) the new credit line is 0 and
      * 2) there is no due or unbilled principals.
-     * @param borrower the owner of the credit line
      * @param newCreditLimit the new limit of the line in the unit of pool token
      * @dev only Evaluation Agent can call
      */
-    function changeCreditLine(uint256 newCreditLimit) public virtual override {
-        _checkReceivableAssetFor(_approvedBorrower, newCreditLimit);
-        super.changeCreditLine(_approvedBorrower, newCreditLimit);
+    function changeCreditLine(uint256 newCreditLimit) public virtual override(BaseCreditPool) {
+        _checkReceivableAssetFor( newCreditLimit);
+        super.changeCreditLine( newCreditLimit);
     }
 
     /**
@@ -114,15 +112,15 @@ contract ReceivableFactoringPool is
         uint256 receivableParam
     ) external virtual override {
         BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
-        super._checkDrawdownEligibility(_approvedBorrower, cr, borrowAmount);
+        super._checkDrawdownEligibility( cr, borrowAmount);
 
         if (receivableAsset == address(0)) revert Errors.zeroAddressProvided();
 
         if (cr.state != BS.CreditState.Approved) revert Errors.creditLineNotInApprovedState();
 
-        _transferReceivableAsset(_approvedBorrower, receivableAsset, receivableParam);
+        _transferReceivableAsset( receivableAsset, receivableParam);
 
-        uint256 netAmountToBorrower = super._drawdown(_approvedBorrower, cr, borrowAmount);
+        uint256 netAmountToBorrower = super._drawdown( cr, borrowAmount);
         emit DrawdownMadeWithReceivable(
             _approvedBorrower,
             borrowAmount,
@@ -241,6 +239,7 @@ contract ReceivableFactoringPool is
     }
 
     function _processReceivedPayment(
+        address borrower,
         uint256 amount,
         bytes32 paymentIdHash,
         BS.PaymentStatus paymentStatus
@@ -250,7 +249,6 @@ contract ReceivableFactoringPool is
         if (_processedPaymentIds[paymentIdHash]) revert Errors.paymentAlreadyProcessed();
 
         (uint256 amountPaid, bool paidoff, bool toReview) = _makePayment(
-            _approvedBorrower,
             amount,
             paymentStatus
         );
@@ -258,14 +256,14 @@ contract ReceivableFactoringPool is
         if (!toReview) {
             _processedPaymentIds[paymentIdHash] = true;
 
-            if (amount > amountPaid) _disburseRemainingFunds(_approvedBorrower, amount - amountPaid);
+            if (amount > amountPaid) _disburseRemainingFunds(borrower, amount - amountPaid);
 
             // Removes the receivable information for the borrower.
-            if (paidoff) _setReceivableInfo(_approvedBorrower, address(0), 0, 0);
+            if (paidoff) _setReceivableInfo(address(0), 0, 0);
 
-            emit ReceivedPaymentProcessed(msg.sender, _approvedBorrower, amount, paymentIdHash);
+            emit ReceivedPaymentProcessed(msg.sender, borrower, amount, paymentIdHash);
         } else {
-            _flagForReview(paymentIdHash, _approvedBorrower, amount);
+            _flagForReview(paymentIdHash, amount);
         }
     }
 
@@ -296,7 +294,6 @@ contract ReceivableFactoringPool is
      * @notice Transfers the backing asset for the credit line. The BaseCreditPool does not
      * require backing asset, thus empty implementation. The extended contracts can
      * support various backing assets, such as receivables, ERC721, and ERC20.
-     * @param borrower the borrower
      * @param receivableAsset the contract address of the receivable asset.
      * @param receivableParam parameter of the receivable asset.
      */
@@ -332,7 +329,6 @@ contract ReceivableFactoringPool is
 
     /**
      * @notice Checks if the borrower has enough receivable to back the requested credit line.
-     * @param borrower the borrower address
      * @param newCreditLimit the credit limit requested
      */
     function _checkReceivableAssetFor(uint256 newCreditLimit)

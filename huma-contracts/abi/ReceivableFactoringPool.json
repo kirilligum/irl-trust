@@ -11,6 +11,11 @@
   },
   {
     "inputs": [],
+    "name": "creditInPeriodExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "creditLineAlreadyExists",
     "type": "error"
   },
@@ -189,7 +194,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "borrower",
+        "name": "_approvedBorrower",
         "type": "address"
       },
       {
@@ -214,7 +219,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "borrower",
+        "name": "_approvedBorrower",
         "type": "address"
       },
       {
@@ -780,11 +785,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "creditLimit",
         "type": "uint256"
@@ -812,11 +812,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "creditLimit",
@@ -860,11 +855,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "newCreditLimit",
@@ -1044,11 +1034,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "numOfPeriods",
         "type": "uint256"
@@ -1093,6 +1078,36 @@
         "internalType": "address",
         "name": "poolConfigAddr",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "lenders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxWithdrawSchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxWithdrawInSchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepaySchedule",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepayInSchedule",
+        "type": "uint256[]"
       }
     ],
     "name": "initialize",
@@ -1101,13 +1116,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isApproved",
     "outputs": [
       {
@@ -1139,13 +1148,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isDefaultReady",
     "outputs": [
       {
@@ -1158,13 +1161,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "isLate",
     "outputs": [
       {
@@ -1262,11 +1259,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
@@ -1337,11 +1329,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "amount",
@@ -1445,13 +1432,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "refreshAccount",
     "outputs": [
       {
@@ -1568,13 +1549,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "triggerDefault",
     "outputs": [
       {

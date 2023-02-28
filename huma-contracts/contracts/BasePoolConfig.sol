@@ -48,11 +48,11 @@ contract BasePoolConfig is Ownable, Initializable {
     uint256 _creditApprovalExpirationInSeconds;
     
     // withdrawSchedule.length = maxWithdrawInSchedule.length
-    uint256[] withdrawSchedule;
-    uint256[] maxWithdrawInSchedule;
+    uint256[] _maxWithdrawSchedule;
+    uint256[] _maxWithdrawInSchedule;
     // maxRepaySchedule.length = maxRepayInSchedule.length
-    uint256[] maxRepaySchedule;
-    uint256[] maxRepayinSchedule;
+    uint256[] _maxRepaySchedule;
+    uint256[] _maxRepayinSchedule;
 }
 
 struct AccruedIncome {
@@ -156,11 +156,7 @@ function initialize(
   string memory _poolName,
   address _poolToken,
   address _humaConfig,
-  address _feeManager,
-  uint256[] _withdrawSchedule,
-  uint256[] _maxWithdrawInSchedule,
-  uint256[] _maxRepaySchedule,
-  uint256[] _maxRepayinSchedule
+  address _feeManager
 
 ) external onlyOwner initializer {
   poolName = _poolName;
@@ -193,12 +189,6 @@ function initialize(
   _poolConfig._payPeriodInDays = 30;
   _poolConfig._receivableRequiredInBps = 10000;
   _poolConfig._poolAprInBps = 1500;
-
-  _poolConfig._withdrawSchedule = _withdrawSchedule;
-  _poolConfig._maxWithdrawInSchedule = _maxWithdrawInSchedule;
-  _poolConfig._maxRepaySchedule = _maxRepaySchedule;
-  _poolConfig._maxRepayinSchedule = _maxRepayinSchedule;
-
 }
 
 /**

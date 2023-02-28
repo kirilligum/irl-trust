@@ -36,6 +36,11 @@
   },
   {
     "inputs": [],
+    "name": "creditInPeriodExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "creditLineAlreadyExists",
     "type": "error"
   },

@@ -2,11 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_creditLimit",
         "type": "uint256"
@@ -91,11 +86,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "amount",

@@ -39,9 +39,9 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
   event RemoveApprovedLender(address indexed lender, address by);
 
   /**
-   * @dev This event emits when new losses are distributed
-   * @param lossesDistributed the amount of losses by the pool
-   */
+  * @dev This event emits when new losses are distributed
+  * @param lossesDistributed the amount of losses by the pool
+  */
   event LossesDistributed(uint256 lossesDistributed, uint256 updatedPoolValue);
 
   constructor() {
@@ -51,7 +51,11 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
   function initialize(
     address poolConfigAddr,
     address borrower,
-    address[] lenders
+    address[] memory lenders,
+    uint256[] memory maxWithdrawSchedule,
+    uint256[] memory maxWithdrawInSchedule,
+    uint256[] memory maxRepaySchedule,
+    uint256[] memory maxRepayInSchedule
   ) external initializer {
     _poolConfig = BasePoolConfig(poolConfigAddr);
     _updateCoreData();
@@ -65,22 +69,26 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
 
     // All pools are off when initiated, will turn on after admins' initial deposits
     _status = PoolStatus.Off;
+     _maxWithdrawSchedule = maxWithdrawSchedule;
+     _maxWithdrawInSchedule = maxWithdrawInSchedule;
+     _maxRepaySchedule = maxRepaySchedule;
+     _maxRepayInSchedule = maxRepayInSchedule;
   }
 
   //********************************************/
   //               LP Functions                //
   //********************************************/
   /**
-   * @notice LP deposits to the pool to earn interest, and share losses
-   *
-   * @notice All deposits should be made by calling this function and
-   * makeInitialDeposit() (for pool owner and EA's initial deposit) only.
-   * Please do NOT directly transfer any digital assets to the contracts,
-   * which will cause a permanent loss and we cannot help reverse transactions
-   * or retrieve assets from the contracts.
-   *
-   * @param amount the number of underlyingToken to be deposited
-   */
+  * @notice LP deposits to the pool to earn interest, and share losses
+  *
+    * @notice All deposits should be made by calling this function and
+  * makeInitialDeposit() (for pool owner and EA's initial deposit) only.
+                          * Please do NOT directly transfer any digital assets to the contracts,
+                          * which will cause a permanent loss and we cannot help reverse transactions
+                          * or retrieve assets from the contracts.
+                            *
+                            * @param amount the number of underlyingToken to be deposited
+                          */
   function deposit(uint256 amount) external virtual override {
     _protocolAndPoolOn();
     return _deposit(msg.sender, amount);
@@ -107,213 +115,213 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
     _protocolAndPoolOn();
     if (amount == 0) revert Errors.zeroAmountProvided();
     if (
-        block.timestamp <
+      block.timestamp <
         _lastDepositTime[msg.sender] + _poolConfig.withdrawalLockoutPeriodInSeconds()
-       ) revert Errors.withdrawTooSoon();
+    ) revert Errors.withdrawTooSoon();
 
-  uint256 withdrawableAmount = _poolToken.withdrawableFundsOf(msg.sender);
-  if (amount > withdrawableAmount) revert Errors.withdrawnAmountHigherThanBalance();
+    uint256 withdrawableAmount = _poolToken.withdrawableFundsOf(msg.sender);
+    if (amount > withdrawableAmount) revert Errors.withdrawnAmountHigherThanBalance();
 
-  _poolConfig.checkWithdrawLiquidityRequirement(msg.sender, withdrawableAmount - amount);
+    _poolConfig.checkWithdrawLiquidityRequirement(msg.sender, withdrawableAmount - amount);
 
-  uint256 shares = _poolToken.burnAmount(msg.sender, amount);
-  _totalPoolValue -= amount;
-  _underlyingToken.safeTransfer(msg.sender, amount);
+    uint256 shares = _poolToken.burnAmount(msg.sender, amount);
+    _totalPoolValue -= amount;
+    _underlyingToken.safeTransfer(msg.sender, amount);
 
-  emit LiquidityWithdrawn(msg.sender, amount, shares);
-}
+    emit LiquidityWithdrawn(msg.sender, amount, shares);
+  }
 
-/**
-* @notice Withdraw all balance from the pool.
-*/
-function withdrawAll() external virtual override {
-  withdraw(_poolToken.withdrawableFundsOf(msg.sender));
-}
+  /**
+   * @notice Withdraw all balance from the pool.
+   */
+  function withdrawAll() external virtual override {
+    withdraw(_poolToken.withdrawableFundsOf(msg.sender));
+  }
 
-function _deposit(address lender, uint256 amount) internal {
-  if (amount == 0) revert Errors.zeroAmountProvided();
-  _onlyApprovedLender(lender);
+  function _deposit(address lender, uint256 amount) internal {
+    if (amount == 0) revert Errors.zeroAmountProvided();
+    _onlyApprovedLender(lender);
 
-  if (_totalPoolValue + amount > _poolConfig.poolLiquidityCap())
-    revert Errors.exceededPoolLiquidityCap();
+    if (_totalPoolValue + amount > _poolConfig.poolLiquidityCap())
+      revert Errors.exceededPoolLiquidityCap();
 
-  uint256 shares = _poolToken.mintAmount(lender, amount);
-  _lastDepositTime[lender] = block.timestamp;
-  _totalPoolValue += amount;
-  _underlyingToken.safeTransferFrom(lender, address(this), amount);
+    uint256 shares = _poolToken.mintAmount(lender, amount);
+    _lastDepositTime[lender] = block.timestamp;
+    _totalPoolValue += amount;
+    _underlyingToken.safeTransferFrom(lender, address(this), amount);
 
-  emit LiquidityDeposited(lender, amount, shares);
-}
+    emit LiquidityDeposited(lender, amount, shares);
+  }
 
-/**
-* @notice Distributes income to token holders.
-*/
-function distributeIncome(uint256 value) internal virtual {
-  uint256 poolIncome = _poolConfig.distributeIncome(value);
-  _totalPoolValue += poolIncome;
-}
+  /**
+   * @notice Distributes income to token holders.
+   */
+  function distributeIncome(uint256 value) internal virtual {
+    uint256 poolIncome = _poolConfig.distributeIncome(value);
+    _totalPoolValue += poolIncome;
+  }
 
-/**
-* @notice Distributes losses associated with the token.
-* Note: The pool (i.e. LPs) is responsible for the losses in a default. The protocol does not
-  * participate in loss distribution. PoolOwner and EA only participate in their LP capacity.
-  * @param value the amount of losses to be distributed
-* @dev We chose not to change distributeIncome to accepted int256 to cover losses for
-  * readability consideration.
-  * @dev It does not make sense to combine reserveIncome() and distributeLosses() since protocol,
-* poolOwner and EA do not participate in losses, but they participate in income reverse.
-  */
-function distributeLosses(uint256 value) internal virtual {
-  if (_totalPoolValue > value) _totalPoolValue -= value;
-  else _totalPoolValue = 0;
-  emit LossesDistributed(value, _totalPoolValue);
-}
+  /**
+   * @notice Distributes losses associated with the token.
+   * Note: The pool (i.e. LPs) is responsible for the losses in a default. The protocol does not
+   * participate in loss distribution. PoolOwner and EA only participate in their LP capacity.
+   * @param value the amount of losses to be distributed
+   * @dev We chose not to change distributeIncome to accepted int256 to cover losses for
+   * readability consideration.
+   * @dev It does not make sense to combine reserveIncome() and distributeLosses() since protocol,
+   * poolOwner and EA do not participate in losses, but they participate in income reverse.
+   */
+  function distributeLosses(uint256 value) internal virtual {
+    if (_totalPoolValue > value) _totalPoolValue -= value;
+    else _totalPoolValue = 0;
+    emit LossesDistributed(value, _totalPoolValue);
+  }
 
-/**
-* @notice Reverse income to token holders.
-* @param value the amount of income to be reverted
-* @dev this is needed when the user pays off early. We collect and distribute interest
-* at the beginning of the pay period. When the user pays off early, the interest
-* for the remainder of the period will be automatically subtraced from the payoff amount.
-    * The portion of the income will be reversed. We can also change the parameter of
-  * distributeIncome to int256. Choose to use a separate function for better readability.
-      */
-function reverseIncome(uint256 value) internal virtual {
-  uint256 poolIncome = _poolConfig.reverseIncome(value);
-  if (_totalPoolValue > poolIncome) _totalPoolValue -= poolIncome;
-  else _totalPoolValue = 0;
-}
+  /**
+   * @notice Reverse income to token holders.
+   * @param value the amount of income to be reverted
+   * @dev this is needed when the user pays off early. We collect and distribute interest
+   * at the beginning of the pay period. When the user pays off early, the interest
+   * for the remainder of the period will be automatically subtraced from the payoff amount.
+   * The portion of the income will be reversed. We can also change the parameter of
+   * distributeIncome to int256. Choose to use a separate function for better readability.
+   */
+  function reverseIncome(uint256 value) internal virtual {
+    uint256 poolIncome = _poolConfig.reverseIncome(value);
+    if (_totalPoolValue > poolIncome) _totalPoolValue -= poolIncome;
+    else _totalPoolValue = 0;
+  }
 
-//********************************************/
-//            Admin Functions                //
-//********************************************/
+  //********************************************/
+  //            Admin Functions                //
+  //********************************************/
 
-/**
-* @notice Lenders need to pass compliance requirements. Pool operator will administer off-chain
-* to make sure potential lenders meet the requirements. Afterwords, the pool operator will
-* call this function to mark a lender as approved.
-  */
-function addApprovedLender(address lender) external virtual override {
-  _onlyPoolOperator();
-  _approvedLenders[lender] = true;
-  emit AddApprovedLender(lender, msg.sender);
-}
+  /**
+   * @notice Lenders need to pass compliance requirements. Pool operator will administer off-chain
+   * to make sure potential lenders meet the requirements. Afterwords, the pool operator will
+   * call this function to mark a lender as approved.
+   */
+  function addApprovedLender(address lender) public virtual override {
+    _onlyPoolOperator();
+    _approvedLenders[lender] = true;
+    emit AddApprovedLender(lender, msg.sender);
+  }
 
-/**
-* @notice turns off the pool. Any pool operator can do so when they see abnormalities.
-*/
-function disablePool() external virtual override {
-  _onlyPoolOperator();
-  _status = PoolStatus.Off;
-  emit PoolDisabled(msg.sender);
-}
+  /**
+   * @notice turns off the pool. Any pool operator can do so when they see abnormalities.
+   */
+  function disablePool() external virtual override {
+    _onlyPoolOperator();
+    _status = PoolStatus.Off;
+    emit PoolDisabled(msg.sender);
+  }
 
-/**
-* @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
-*/
-function enablePool() external virtual override {
-  _onlyOwnerOrHumaMasterAdmin();
+  /**
+   * @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
+   */
+  function enablePool() external virtual override {
+    _onlyOwnerOrHumaMasterAdmin();
 
-  _poolConfig.checkLiquidityRequirement();
+    _poolConfig.checkLiquidityRequirement();
 
-  _status = PoolStatus.On;
-  emit PoolEnabled(msg.sender);
-}
+    _status = PoolStatus.On;
+    emit PoolEnabled(msg.sender);
+  }
 
-/**
-* @notice Disables a lender. This prevents the lender from making more deposits.
-* The capital that the lender has contributed can continue to work as normal.
-  */
-function removeApprovedLender(address lender) external virtual override {
-  _onlyPoolOperator();
-  _approvedLenders[lender] = false;
-  emit RemoveApprovedLender(lender, msg.sender);
-}
+  /**
+   * @notice Disables a lender. This prevents the lender from making more deposits.
+   * The capital that the lender has contributed can continue to work as normal.
+   */
+  function removeApprovedLender(address lender) external virtual override {
+    _onlyPoolOperator();
+    _approvedLenders[lender] = false;
+    emit RemoveApprovedLender(lender, msg.sender);
+  }
 
-/**
-* @notice Points the pool configuration to PoolConfig contract
-*/
-function setPoolConfig(address poolConfigAddr) external override {
-  _onlyOwnerOrHumaMasterAdmin();
-  address oldConfig = address(_poolConfig);
-  if (poolConfigAddr == oldConfig) revert Errors.sameValue();
+  /**
+   * @notice Points the pool configuration to PoolConfig contract
+   */
+  function setPoolConfig(address poolConfigAddr) external override {
+    _onlyOwnerOrHumaMasterAdmin();
+    address oldConfig = address(_poolConfig);
+    if (poolConfigAddr == oldConfig) revert Errors.sameValue();
 
-  // note set old pool config allowance to 0
-  _safeApproveForPoolConfig(0);
+    // note set old pool config allowance to 0
+    _safeApproveForPoolConfig(0);
 
-  BasePoolConfig newPoolConfig = BasePoolConfig(poolConfigAddr);
-  newPoolConfig.onlyOwnerOrHumaMasterAdmin(msg.sender);
+    BasePoolConfig newPoolConfig = BasePoolConfig(poolConfigAddr);
+    newPoolConfig.onlyOwnerOrHumaMasterAdmin(msg.sender);
 
-  _poolConfig = newPoolConfig;
+    _poolConfig = newPoolConfig;
 
-  // note approve max amount to pool config for admin withdraw functions
-  _safeApproveForPoolConfig(type(uint256).max);
+    // note approve max amount to pool config for admin withdraw functions
+    _safeApproveForPoolConfig(type(uint256).max);
 
-  emit PoolConfigChanged(msg.sender, poolConfigAddr);
-}
+    emit PoolConfigChanged(msg.sender, poolConfigAddr);
+  }
 
-/**
-* @notice Updates references to core supporting contracts: underlying token, pool token,
-* Huma Config, and Fee Manager.
-  */
-function updateCoreData() external {
-  _onlyOwnerOrHumaMasterAdmin();
-  _updateCoreData();
-}
+  /**
+   * @notice Updates references to core supporting contracts: underlying token, pool token,
+   * Huma Config, and Fee Manager.
+   */
+  function updateCoreData() external {
+    _onlyOwnerOrHumaMasterAdmin();
+    _updateCoreData();
+  }
 
-/**
-* @notice Gets the address of core supporting contracts: underlying token, pool token,
-* Huma Config, and Fee Manager.
-  */
-function getCoreData()
-external
-view
-returns (
-  address underlyingToken_,
-  address poolToken_,
-  address humaConfig_,
-  address feeManager_
-)
-{
-  underlyingToken_ = address(_underlyingToken);
-  poolToken_ = address(_poolToken);
-  humaConfig_ = address(_humaConfig);
-  feeManager_ = address(_feeManager);
-}
+  /**
+   * @notice Gets the address of core supporting contracts: underlying token, pool token,
+   * Huma Config, and Fee Manager.
+   */
+  function getCoreData()
+  external
+  view
+  returns (
+    address underlyingToken_,
+    address poolToken_,
+    address humaConfig_,
+    address feeManager_
+  )
+  {
+    underlyingToken_ = address(_underlyingToken);
+    poolToken_ = address(_poolToken);
+    humaConfig_ = address(_humaConfig);
+    feeManager_ = address(_feeManager);
+  }
 
-/// Reports if the given account has been approved as a lender for this pool
-function isApprovedLender(address account) external view virtual override returns (bool) {
-  return _approvedLenders[account];
-}
+  /// Reports if the given account has been approved as a lender for this pool
+  function isApprovedLender(address account) external view virtual override returns (bool) {
+    return _approvedLenders[account];
+  }
 
-/// Gets the on/off status of the pool
-function isPoolOn() external view virtual override returns (bool status) {
-  if (_status == PoolStatus.On) return true;
-  else return false;
-}
+  /// Gets the on/off status of the pool
+  function isPoolOn() external view virtual override returns (bool status) {
+    if (_status == PoolStatus.On) return true;
+    else return false;
+  }
 
-/// Gets the last deposit time of the given lender
-function lastDepositTime(address account) external view virtual override returns (uint256) {
-  return _lastDepositTime[account];
-}
+  /// Gets the last deposit time of the given lender
+  function lastDepositTime(address account) external view virtual override returns (uint256) {
+    return _lastDepositTime[account];
+  }
 
-/// Gets the address of poolConfig
-function poolConfig() external view virtual override returns (address) {
-  return address(_poolConfig);
-}
+  /// Gets the address of poolConfig
+  function poolConfig() external view virtual override returns (address) {
+    return address(_poolConfig);
+  }
 
-/// Gets the total value of the pool, measured by the units of underlying token
-function totalPoolValue() external view override returns (uint256) {
-  return _totalPoolValue;
-}
+  /// Gets the total value of the pool, measured by the units of underlying token
+  function totalPoolValue() external view override returns (uint256) {
+    return _totalPoolValue;
+  }
 
-/**
-* @notice In PoolConfig, the admins (protocol, pool owner, EA) can withdraw the rewards
-* that they have earned so far. This gives allowance for PoolConfig to enable such withdraw.
-    */
-function _safeApproveForPoolConfig(uint256 amount) internal {
-  address config = address(_poolConfig);
-  uint256 allowance = _underlyingToken.allowance(address(this), config);
+  /**
+   * @notice In PoolConfig, the admins (protocol, pool owner, EA) can withdraw the rewards
+   * that they have earned so far. This gives allowance for PoolConfig to enable such withdraw.
+   */
+  function _safeApproveForPoolConfig(uint256 amount) internal {
+    address config = address(_poolConfig);
+    uint256 allowance = _underlyingToken.allowance(address(this), config);
 
   // Call safeApprove when the allowance is changed from >0 to 0, or from 0 to >0.
   if ((amount == 0 && allowance > 0) || (amount > 0 && allowance == 0)) {
@@ -364,4 +372,5 @@ function _onlyOwnerOrHumaMasterAdmin() internal view {
 function _onlyPoolOperator() internal view {
   if (!_poolConfig.isOperator(msg.sender)) revert Errors.poolOperatorRequired();
 }
+
 }

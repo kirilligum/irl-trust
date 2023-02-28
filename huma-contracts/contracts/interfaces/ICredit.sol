@@ -57,7 +57,8 @@ interface ICredit {
     function triggerDefault() external returns (uint256 losses);
 
     /// Gets the approval status of the credit line for the borrower
-    function isApproved() external view returns (bool);
+    //@param check borrower or evaluationagent
+    function isApproved(address check) external view returns (bool);
 
     /// Checks if the credit line owned by the borrower is ready for default
     function isDefaultReady() external view returns (bool);

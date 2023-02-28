@@ -1121,7 +1121,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "check",
+        "type": "address"
+      }
+    ],
     "name": "isApproved",
     "outputs": [
       {

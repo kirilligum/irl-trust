@@ -342,8 +342,8 @@ return losses;
       return _creditRecordStaticMapping[account];
     }
 
-    function isApproved() external view virtual override returns (bool) {
-      if ((_creditRecordMapping[_approvedBorrower].state >= BS.CreditState.Approved)) return true;
+    function isApproved(address check) external view virtual override returns (bool) {
+      if ((_creditRecordMapping[check].state >= BS.CreditState.Approved)) return true;
       else return false;
     }
 

@@ -756,6 +756,7 @@ return losses;
 
       if (amountToCollect > 0 && paymentStatus == BS.PaymentStatus.NotReceived) {
         // Transfer assets from the _borrower to pool locker
+        _checkAndUpdateMaxRepaySchedule(amount);
         _underlyingToken.safeTransferFrom(_approvedBorrower, address(this), amountToCollect);
         emit PaymentMade(
           _approvedBorrower,
@@ -769,6 +770,27 @@ return losses;
       // amountToCollect == payoffAmount indicates whether it is paid off or not.
       // Use >= as a safe practice
       return (amountToCollect, amountToCollect >= payoffAmount, false);
+    }
+
+    function _checkAndUpdateMaxRepaySchedule(
+      uint256 amount
+    ) internal {
+      if (block.timestamp > _maxRepaySchedule[0]) {
+        if(_maxWInSchedule[0] > 0) {
+          _maxRepayInSchedule[1] += _maxRepayInSchedule[0];
+        }
+
+        for (uint i = 0; i<_maxRepaySchedule.length-1; i++){
+            _maxRepaySchedule[i] = _maxRepaySchedule[i+1];
+            _maxRepayInSchedule[i] = _maxRepayInSchedule[i+1];
+        }
+        _maxRepaySchedule.pop();
+        _maxRepayInSchedule.pop();
+      }
+
+      uint256 currentTermAmount = _maxWithdrawInSchedule[0];
+      if ( amount > _maxWithdrawInSchedule[0]) revert Errors.maxRepayInPeriodExceeded();
+
     }
 
     /**

@@ -222,7 +222,7 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
   function enablePool() external virtual override {
     _onlyOwnerOrHumaMasterAdmin();
 
-    _poolConfig.checkLiquidityRequirement();
+    //_poolConfig.checkLiquidityRequirement();
 
     _status = PoolStatus.On;
     emit PoolEnabled(msg.sender);

@@ -14,6 +14,7 @@ function toToken(number) {
 async function deployContracts(
 ) {
   const [
+    defaultDeployer,
     poolOwner,
     poolOperator,
     poolOwnerTreasury,
@@ -28,30 +29,30 @@ async function deployContracts(
     eaServiceAccount,
     pdsServiceAccount,
   ] = await ethers.getSigners()
-    const fees = [toToken(1000), 100, toToken(2000), 100, 0]
-    const principalRateInBps = 0
-    const isReceivableContractFlag = false
-    let maxWithdrawSchedule = [
-      Math.floor(new Date().getTime() / 1000)+3600,
-      Math.floor((new Date().getTime() / 1000))+7200,
-      Math.floor((new Date().getTime() / 1000))+10800,
-    ]
-    console.log(maxWithdrawSchedule)
-    const maxWithdrawInSchedule = [
-      ethers.utils.parseUnits('200','ether'),
-      ethers.utils.parseUnits('100','ether'),
-      ethers.utils.parseUnits('50','ether'),
-    ];
-    const maxRepaySchedule = [
-      Math.floor((new Date().getTime() / 1000))+7200,
-      Math.floor((new Date().getTime() / 1000))+10800,
-      Math.floor((new Date().getTime() / 1000))+14400,
-    ]
-    const maxRepayInSchedule = [
-      ethers.utils.parseUnits('50','ether'),
-      ethers.utils.parseUnits('100','ether'),
-      ethers.utils.parseUnits('200','ether'),
-    ];
+  const fees = [toToken(1000), 100, toToken(2000), 100, 0]
+  const principalRateInBps = 0
+  const isReceivableContractFlag = false
+  let maxWithdrawSchedule = [
+    Math.floor(new Date().getTime() / 1000)+3600,
+    Math.floor((new Date().getTime() / 1000))+7200,
+    Math.floor((new Date().getTime() / 1000))+10800,
+  ]
+  console.log(maxWithdrawSchedule)
+  const maxWithdrawInSchedule = [
+    ethers.utils.parseUnits('200','ether'),
+    ethers.utils.parseUnits('100','ether'),
+    ethers.utils.parseUnits('50','ether'),
+  ];
+  const maxRepaySchedule = [
+    Math.floor((new Date().getTime() / 1000))+7200,
+    Math.floor((new Date().getTime() / 1000))+10800,
+    Math.floor((new Date().getTime() / 1000))+14400,
+  ]
+  const maxRepayInSchedule = [
+    ethers.utils.parseUnits('50','ether'),
+    ethers.utils.parseUnits('100','ether'),
+    ethers.utils.parseUnits('200','ether'),
+  ];
   // Deploy EvaluationAgentNFT
   const EvaluationAgentNFT = await ethers.getContractFactory("EvaluationAgentNFT");
   eaNFTContract = await EvaluationAgentNFT.deploy();
@@ -152,7 +153,7 @@ async function deployContracts(
   poolContractTwoFactory = await ethers.getContractFactory("BaseCreditPool");
 
   const poolImplOne = await poolContractOneFactory.deploy();
-  const poolImplTwo = await poolContractOneFactory.deploy();
+  const poolImplTwo = await poolContractTwoFactory.deploy();
   //const BaseCreditPool = await ethers.getContractFactory("BaseCreditPool");
   //const poolImplOne = await BaseCreditPool.deploy();
   await poolImplOne.deployed();
@@ -229,7 +230,7 @@ async function deployContracts(
   await poolConfigOne.connect(poolOwner).setPoolOwnerTreasury(poolOwnerTreasury.address);
   await poolConfigOne.connect(poolOwner).addPoolOperator(poolOwner.address);
   await poolConfigOne.connect(poolOwner).addPoolOperator(poolOperator.address);
-  
+
   await poolConfigTwo.connect(poolOwner).setEARewardsAndLiquidity(1875, 10);
 
   await poolConfigTwo.connect(poolOwner).setPoolOwnerTreasury(poolOwnerTreasury.address);
@@ -248,22 +249,22 @@ async function deployContracts(
   await testTokenContract
     .connect(poolOwnerTreasury)
     .approve(poolContractOne.address, toToken(1_000_000));
-  await poolContractOne.connect(poolOwnerTreasury).makeInitialDeposit(toToken(1_000_000));
+  //await poolContractOne.connect(poolOwnerTreasury).makeInitialDeposit(toToken(1_000_000));
   console.log('initial deposit one')
   await testTokenContract
     .connect(poolOwnerTreasury)
     .approve(poolContractTwo.address, toToken(1_000_000));
-  await poolContractTwo.connect(poolOwnerTreasury).makeInitialDeposit(toToken(1_000_000));
+  //await poolContractTwo.connect(poolOwnerTreasury).makeInitialDeposit(toToken(1_000_000));
   console.log('initial deposit two')
   await testTokenContract
     .connect(evaluationAgent)
     .approve(poolContractOne.address, toToken(2_000_000));
-  await poolContractOne.connect(evaluationAgent).makeInitialDeposit(toToken(2_000_000));
+  //await poolContractOne.connect(evaluationAgent).makeInitialDeposit(toToken(2_000_000));
   console.log('initial deposit evalAgent')
   await testTokenContract
     .connect(evaluationAgent)
     .approve(poolContractTwo.address, toToken(2_000_000));
-  await poolContractTwo.connect(evaluationAgent).makeInitialDeposit(toToken(2_000_000));
+  //await poolContractTwo.connect(evaluationAgent).makeInitialDeposit(toToken(2_000_000));
   console.log('initial deposit evalAgent pool 2')
 
   console.log('initial deposits made')
@@ -283,28 +284,35 @@ async function deployContracts(
   await poolConfigTwo.connect(poolOwner).setMaxCreditLine(toToken(10_000_000));
   console.log('Aprs and max credit lines')
 
-  await testTokenContract.connect(lenderA).approve(poolContractOne.address, toToken(2_000_000));
-  await testTokenContract.connect(lenderA).approve(poolContractTwo.address, toToken(2_000_000));
-  await testTokenContract.connect(lenderB).approve(poolContractTwo.address, toToken(2_000_000));
-  console.log('approvals complete')
-  await poolContractOne.connect(lenderA).deposit(toToken(2_000_000));
-  console.log('lender A')
-  await poolContractTwo.connect(lenderA).deposit(toToken(2_000_000));
-  console.log('lender A, in Two')
-  await poolContractTwo.connect(lenderB).deposit(toToken(2_000_000));
-  console.log('lenders deposits complete')
-  return [
-    {poolA: {hdtContractOne, poolConfigOne, poolContractOne, poolImplOne, poolProxyOne}},
-    {poolB: {hdtContractTwo, poolConfigTwo, poolContractTwo, poolImplTwo, poolProxyTwo}},
-    ,{config: {humaConfigContract, feeManagerContract, testTokenContract, eaNFTContract}}
-  ];
+  return {
+    poolA: {hdtContractOne, poolConfigOne, poolContract:poolContractOne, poolImplOne, poolProxyOne},
+    poolB: {hdtContractTwo, poolConfigTwo, poolContract:poolContractTwo, poolImplTwo, poolProxyTwo},
+    config: {humaConfigContract, feeManagerContract, testTokenContract, eaNFTContract},
+    token: {testTokenContract},
+    signers: {
+      defaultDeployer,
+      proxyOwner,
+      lenderA,
+      lenderB,
+      borrowerA,
+      borrowerB,
+      treasury,
+      evaluationAgent,
+      poolOwner,
+      protocolOwner,
+      eaServiceAccount,
+      pdsServiceAccount,
+      poolOperator,
+      poolOwnerTreasury,
+    }
+  }
 }
 
 if (require.main === module) {
   deployContracts()
     .then(() => {
-          process.exit(1)
-        })
+      process.exit(1)
+    })
     .catch(error => {
       console.error(error)
       process.exit(1)
@@ -312,3 +320,4 @@ if (require.main === module) {
 }
 
 exports.deployContracts = deployContracts
+exports.toToken = toToken

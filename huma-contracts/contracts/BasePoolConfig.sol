@@ -47,12 +47,6 @@ contract BasePoolConfig is Ownable, Initializable {
     // the duration of a credit line without an initial drawdown
     uint256 _creditApprovalExpirationInSeconds;
     
-    // withdrawSchedule.length = maxWithdrawInSchedule.length
-    uint256[] _maxWithdrawSchedule;
-    uint256[] _maxWithdrawInSchedule;
-    // maxRepaySchedule.length = maxRepayInSchedule.length
-    uint256[] _maxRepaySchedule;
-    uint256[] _maxRepayinSchedule;
 }
 
 struct AccruedIncome {
@@ -184,8 +178,8 @@ function initialize(
   // _liquidityCap, _maxCreditLine, _creditApprovalExpirationInSeconds are left at 0.
   _poolConfig._rewardRateInBpsForEA = 100;
   _poolConfig._rewardRateInBpsForPoolOwner = 100;
-  _poolConfig._liquidityRateInBpsByEA = 200;
-  _poolConfig._liquidityRateInBpsByPoolOwner = 200;
+  _poolConfig._liquidityRateInBpsByEA = 0;
+  _poolConfig._liquidityRateInBpsByPoolOwner = 0;
   _poolConfig._payPeriodInDays = 30;
   _poolConfig._receivableRequiredInBps = 10000;
   _poolConfig._poolAprInBps = 1500;

@@ -148,23 +148,23 @@ async function deployContracts(
 
   // Deploy pool contract
   let poolContractOneFactory;
-  let poolContractTwoFactory;
+  //let poolContractTwoFactory;
   poolContractOneFactory = await ethers.getContractFactory("BaseCreditPool");
-  poolContractTwoFactory = await ethers.getContractFactory("BaseCreditPool");
+  //poolContractTwoFactory = await ethers.getContractFactory("BaseCreditPool");
 
   const poolImplOne = await poolContractOneFactory.deploy();
-  const poolImplTwo = await poolContractTwoFactory.deploy();
+  //const poolImplTwo = await poolContractOneFactory.deploy();
   //const BaseCreditPool = await ethers.getContractFactory("BaseCreditPool");
   //const poolImplOne = await BaseCreditPool.deploy();
   await poolImplOne.deployed();
-  await poolImplTwo.deployed();
+  //await poolImplTwo.deployed();
   const poolProxyOne = await TransparentUpgradeableProxyOne.deploy(
     poolImplOne.address,
     proxyOwner.address,
     []
   );
   const poolProxyTwo = await TransparentUpgradeableProxyTwo.deploy(
-    poolImplTwo.address,
+    poolImplOne.address,
     proxyOwner.address,
     []
   );
@@ -172,7 +172,7 @@ async function deployContracts(
   await poolProxyTwo.deployed();
 
   const poolContractOne = poolContractOneFactory.attach(poolProxyOne.address);
-  const poolContractTwo = poolContractTwoFactory.attach(poolProxyTwo.address);
+  const poolContractTwo = poolContractOneFactory.attach(poolProxyTwo.address);
   await poolContractOne.initialize(
     poolConfigOne.address,
     borrowerA.address,
@@ -286,7 +286,7 @@ async function deployContracts(
 
   return {
     poolA: {hdtContractOne, poolConfigOne, poolContract:poolContractOne, poolImplOne, poolProxyOne},
-    poolB: {hdtContractTwo, poolConfigTwo, poolContract:poolContractTwo, poolImplTwo, poolProxyTwo},
+    poolB: {hdtContractTwo, poolConfigTwo, poolContract:poolContractTwo, poolImplOne, poolProxyTwo},
     config: {humaConfigContract, feeManagerContract, testTokenContract, eaNFTContract},
     token: {testTokenContract},
     signers: {

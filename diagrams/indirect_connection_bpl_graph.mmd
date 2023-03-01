@@ -1,0 +1,19 @@
+graph TD
+  subgraph borrowers
+  b[/"b: nephew"\]
+  end
+  subgraph pools
+  p1(("p1: <br/> ($100)"))
+  p2(("p2: <br/> ($100)"))
+  end
+  subgraph lenders
+    l1[\"l1: uncle"/]
+    l2[\"l2: uncle's friend"/]
+  end
+  b===p1
+  p1===l1
+  p2===l1
+  p2===l2
+  b-.-|"score:100"|l1
+  b-.-|"score:75"|l2
+  l1---|"$100"|l2

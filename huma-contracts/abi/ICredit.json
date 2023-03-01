@@ -2,9 +2,24 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "creditLimit",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "maxCreditPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "creditPeriods",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepayPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "repayPeriods",
+        "type": "uint256[]"
       },
       {
         "internalType": "uint256",
@@ -187,29 +202,6 @@
         "type": "tuple"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_creditLimit",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_intervalInDays",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_numOfPayments",
-        "type": "uint256"
-      }
-    ],
-    "name": "requestCredit",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

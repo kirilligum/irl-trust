@@ -5,7 +5,10 @@ import {BaseStructs as BS} from "../libraries/BaseStructs.sol";
 interface ICredit {
     /// Approves a credit line request
     function approveCredit(
-        uint256 creditLimit,
+    uint256[] memory maxCreditPerPeriod,
+    uint256[] memory creditPeriods,
+    uint256[] memory maxRepayPerPeriod,
+    uint256[] memory repayPeriods, 
         uint256 intervalInDays,
         uint256 remainingPeriods,
         uint256 aprInBps
@@ -44,12 +47,13 @@ interface ICredit {
      * @param  _intervalInDays the time interval between two payments
      * @param _numOfPayments total number of payment cycles for the credit line
      */
+    /*
     function requestCredit(
         uint256 _creditLimit,
         uint256 _intervalInDays,
         uint256 _numOfPayments
     ) external;
-
+   */
     /**
      * @notice Triggers default for the credit line owned by the borrower
      * @return losses the write off by the pool because of this default

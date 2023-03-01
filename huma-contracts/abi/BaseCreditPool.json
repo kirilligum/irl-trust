@@ -16,11 +16,6 @@
   },
   {
     "inputs": [],
-    "name": "creditLineAlreadyExists",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "creditLineExceeded",
     "type": "error"
   },
@@ -106,11 +101,6 @@
   },
   {
     "inputs": [],
-    "name": "requestedCreditWithZeroDuration",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "sameValue",
     "type": "error"
   },
@@ -184,9 +174,27 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "creditLimit",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "maxCreditPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "creditPeriods",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "maxRepayPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "repayPeriods",
+        "type": "uint256[]"
       },
       {
         "indexed": false,
@@ -620,9 +628,24 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "creditLimit",
-        "type": "uint256"
+        "internalType": "uint256[]",
+        "name": "maxCreditPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "creditPeriods",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "maxRepayPerPeriod",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "repayPeriods",
+        "type": "uint256[]"
       },
       {
         "internalType": "uint256",
@@ -842,6 +865,42 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getRepaySchedule",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWithdrawSchedule",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -885,7 +944,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "check",
+        "type": "address"
+      }
+    ],
     "name": "isApproved",
     "outputs": [
       {
@@ -1088,29 +1153,6 @@
       }
     ],
     "name": "removeApprovedLender",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "creditLimit",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "intervalInDays",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "numOfPayments",
-        "type": "uint256"
-      }
-    ],
-    "name": "requestCredit",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

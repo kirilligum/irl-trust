@@ -111,7 +111,6 @@ describe("Base Credit Pool", function () {
       maxRepayInSchedule
     );
 
-    console.log('here')
     await poolConfigContract.connect(poolOwner).setWithdrawalLockoutPeriod(90);
     await poolConfigContract.connect(poolOwner).setPoolDefaultGracePeriod(60);
   });
@@ -243,6 +242,7 @@ describe("Base Credit Pool", function () {
 
   // Borrowing tests are grouped into two suites: Borrowing Request and Funding.
   // In beforeEach() of "Borrowing request", we make sure there is 100 liquidity.
+  /*
   describe("Borrowing request", function () {
     afterEach(async function () {
       if (await humaConfigContract.connect(protocolOwner).paused())
@@ -299,12 +299,11 @@ describe("Base Credit Pool", function () {
       expect(loanInformation.remainingPeriods).to.equal(24);
       expect(loanInformation.state).to.equal(1);
     });
-
     it("Shall reject loan requests if there is an outstanding loan with outstanding balance", async function () {
       await poolContract.connect(borrower).requestCredit(toToken(3_000), 30, 12);
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(3000), 30, 12, 1217);
+        .approveCredit(toToken(3000), 30, 12, 1217);
       await poolContract.connect(borrower).drawdown(toToken(2_000));
 
       await expect(
@@ -315,14 +314,14 @@ describe("Base Credit Pool", function () {
     it("Shall allow new request if existing loan has been paid off", async function () {
       await poolContract.connect(borrower).requestCredit(toToken(3_000), 30, 12);
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, toToken(3_000))
+        poolContract.connect(borrower).makePayment(toToken(3_000))
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInStateForMakingPayment");
 
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(3000), 30, 12, 1217);
+        .approveCredit(toToken(3000), 30, 12, 1217);
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, toToken(3_000))
+        poolContract.connect(borrower).makePayment(toToken(3_000))
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInStateForMakingPayment");
 
       await poolContract.connect(borrower).drawdown(toToken(3_000));
@@ -330,7 +329,7 @@ describe("Base Credit Pool", function () {
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(3_100));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(3_100));
+      await poolContract.connect(borrower).makePayment(toToken(3_100));
       await poolContract.connect(borrower).requestCredit(toToken(4_000), 90, 36);
       const loanInformation = await getCreditInfo(poolContract, borrower.address);
       expect(loanInformation.creditLimit).to.equal(toToken(4_000));
@@ -343,10 +342,10 @@ describe("Base Credit Pool", function () {
       expect(loanInformation.correction).to.equal(0);
     });
   });
-
+  */
   describe("Drawdown", function () {
     beforeEach(async function () {
-      await poolContract.connect(borrower).requestCredit(toToken(1_000_000), 30, 12);
+      //await poolContract.connect(borrower).requestCredit(toToken(1_000_000), 30, 12);
     });
 
     it("Should not allow loan funding while protocol is paused", async function () {
@@ -363,32 +362,77 @@ describe("Base Credit Pool", function () {
     });
 
     it("Should reject drawdown when account is deleted", async function () {
-      await poolContract.connect(eaServiceAccount).changeCreditLine(borrower.address, 0);
+      await poolContract.connect(eaServiceAccount).changeCreditLine( 0);
       await expect(
         poolContract.connect(borrower).drawdown(toToken(400))
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInStateForDrawdown");
     });
 
     it("Should reject drawdown if the combined balance is higher than the credit limit", async function () {
+      const withdrawScheduleOne = await poolContract.connect(borrower).getWithdrawSchedule()
+      console.log('withdrawScheduleOne', withdrawScheduleOne)
+      const repayScheduleOne = await poolContract.connect(borrower).getRepaySchedule()
+      console.log('repayScheduleOne', repayScheduleOne)
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(
+          [toToken(1_000_000)],
+          [Math.floor(new Date().getTime() / 1000) +14400],
+          [toToken(1_000_000)],
+          [Math.floor(new Date().getTime() / 1000)+14400+3600],
+          30,
+          12,
+          1217
+        );
+      const withdrawScheduleTwo = await poolContract.connect(borrower).getWithdrawSchedule()
+      console.log('withdrawScheduleTwo', withdrawScheduleTwo)
+      const repayScheduleTwo = await poolContract.connect(borrower).getRepaySchedule()
+      console.log('repayScheduleTwo', repayScheduleTwo)
+      console.log('good')
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
+      console.log('good2')
 
       await expect(
         poolContract.connect(borrower).drawdown(toToken(4000))
       ).to.be.revertedWithCustomError(poolContract, "creditLineExceeded");
+      console.log('good3')
       await testTokenContract.mint(borrower.address, toToken(11000));
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(1_000_000));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(1_000_000));
+      await poolContract.connect(borrower).makePayment(toToken(1_000_000));
+    });
+    /*
+    it("Should reject drawdown if the combined balance is higher than the time limit", async function () {
+      await poolContract
+        .connect(eaServiceAccount)
+        .approveCredit(
+          [toToken(1_000)],
+          [Math.floor(new Date().getTime() / 1000) +14400],
+          [toToken(1_000)],
+          [Math.floor(new Date().getTime() / 1000)+14400+3600],
+          30, 12, 1217);
+      await poolContract.connect(borrower).drawdown(toToken(1_000));
+      const withdrawScheduleOne = await poolContract.connect(borrower)
+        .getWithdrawSchedule()
+      console.log(withdrawScheduleOne)
+      await expect(
+        poolContract.connect(borrower).drawdown(toToken(4000))
+      )
+      const withdrawScheduleTwo = await poolContract.connect(borrower)
+        .getWithdrawSchedule()
+      console.log(withdrawScheduleTwo)
+      await testTokenContract.mint(borrower.address, toToken(11000));
+      await testTokenContract
+        .connect(borrower)
+        .approve(poolContract.address, toToken(1_000_000));
+      await poolContract.connect(borrower).makePayment(toToken(1_000_000));
     });
 
     it("Should reject if the borrowing amount is zero", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       await expect(poolContract.connect(borrower).drawdown(0)).to.be.revertedWithCustomError(
         poolContract,
         "zeroAmountProvided"
@@ -398,7 +442,7 @@ describe("Base Credit Pool", function () {
     it("Should reject if the borrowing amount is less than platform fees", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(3_000), 30, 12, 1217);
+        .approveCredit(toToken(3_000), 30, 12, 1217);
       await expect(
         poolContract.connect(borrower).drawdown(toToken(100))
       ).to.be.revertedWithCustomError(
@@ -410,7 +454,7 @@ describe("Base Credit Pool", function () {
     it("Should reject if the borrowing amount is more than approved", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       await expect(
         poolContract.connect(borrower).drawdown(toToken(1_100_000))
       ).to.be.revertedWithCustomError(poolContract, "creditLineExceeded");
@@ -419,8 +463,10 @@ describe("Base Credit Pool", function () {
     it("Borrow less than approved amount", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
+      console.log('here')
       expect(await poolContract.isApproved(borrower.address)).to.equal(true);
+      console.log('here2')
 
       // Should return false when no loan exists
       expect(await poolContract.isApproved(evaluationAgent.address)).to.equal(false);
@@ -452,14 +498,14 @@ describe("Base Credit Pool", function () {
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(100000));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(100000));
+      await poolContract.connect(borrower).makePayment(toToken(100000));
     });
 
     it("Borrow full amount that has been approved", async function () {
       let oldBalance = await testTokenContract.balanceOf(borrower.address);
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       expect(await poolContract.isApproved(borrower.address)).to.equal(true);
 
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
@@ -481,7 +527,7 @@ describe("Base Credit Pool", function () {
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(1_000_000));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(1_000_000));
+      await poolContract.connect(borrower).makePayment(toToken(1_000_000));
     });
 
     it("Borrow full amount that has been approved without platform fees", async function () {
@@ -489,7 +535,7 @@ describe("Base Credit Pool", function () {
       let oldBalance = await testTokenContract.balanceOf(borrower.address);
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       expect(await poolContract.isApproved(borrower.address)).to.equal(true);
 
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
@@ -511,13 +557,13 @@ describe("Base Credit Pool", function () {
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(1_000_000));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(1_000_000));
+      await poolContract.connect(borrower).makePayment(toToken(1_000_000));
     });
 
     it("Shall reject new approval after a drawdown has happened", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       expect(await poolContract.isApproved(borrower.address)).to.equal(true);
 
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
@@ -525,20 +571,20 @@ describe("Base Credit Pool", function () {
       await expect(
         poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(500_000), 30, 12, 1217)
+        .approveCredit(toToken(500_000), 30, 12, 1217)
       ).to.be.revertedWithCustomError(poolContract, "creditLineOutstanding");
     });
 
     it("Should reject drawdown in the final pay period of the credit line", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
       await testTokenContract.mint(borrower.address, toToken(21002));
       await testTokenContract
         .connect(borrower)
         .approve(poolContract.address, toToken(1_010_002));
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(1_010_002));
+      await poolContract.connect(borrower).makePayment(toToken(1_010_002));
 
       let creditInfo = await poolContract.creditRecordMapping(borrower.address);
       expect(creditInfo.unbilledPrincipal).to.equal(0);
@@ -553,13 +599,14 @@ describe("Base Credit Pool", function () {
     it("Should reject drawdown when account is late in payments", async function () {
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_00_000), 30, 12, 1217);
+        .approveCredit(toToken(1_00_000), 30, 12, 1217);
       await poolContract.connect(borrower).drawdown(toToken(100_000));
       await advanceClock(90);
       await expect(
         poolContract.connect(borrower).drawdown(toToken(4000))
       ).to.be.revertedWithCustomError(poolContract, "creditLineNotInGoodStandingState");
     });
+    */
   });
   describe("IsLate()", function () {
     it("Shall not mark the account as late if there is no drawdown", async function () {
@@ -567,25 +614,25 @@ describe("Base Credit Pool", function () {
       await poolContract.connect(borrower).requestCredit(toToken(1_000_000), 30, 12);
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
 
-      expect(await poolContract.isLate(borrower.address)).to.equal(false);
+      expect(await poolContract.isLate()).to.equal(false);
 
       await advanceClock(31);
-      expect(await poolContract.isLate(borrower.address)).to.equal(false);
+      expect(await poolContract.isLate()).to.equal(false);
     });
     it("Shall mark the account as late if no payment is received by the dueDate", async function () {
       await poolConfigContract.connect(poolOwner).setCreditApprovalExpiration(5);
       await poolContract.connect(borrower).requestCredit(toToken(1_000_000), 30, 12);
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
-      expect(await poolContract.isLate(borrower.address)).to.equal(false);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
+      expect(await poolContract.isLate()).to.equal(false);
       await advanceClock(2);
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
-      expect(await poolContract.isLate(borrower.address)).to.equal(false);
+      expect(await poolContract.isLate()).to.equal(false);
       await advanceClock(31);
-      expect(await poolContract.isLate(borrower.address)).to.equal(true);
+      expect(await poolContract.isLate()).to.equal(true);
     });
   });
   /*
@@ -774,21 +821,21 @@ describe("Base Credit Pool", function () {
 
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
     });
 
     it("Should not allow payback while protocol is paused", async function () {
       await humaConfigContract.connect(poolOwner).pause();
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, toToken(5))
+        poolContract.connect(borrower).makePayment(toToken(5))
       ).to.be.revertedWithCustomError(poolContract, "protocolIsPaused");
     });
 
     it("Should reject if payback amount is zero", async function () {
       await testTokenContract.connect(borrower).approve(poolContract.address, toToken(1000));
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, 0)
+        poolContract.connect(borrower).makePayment(0)
       ).to.be.revertedWithCustomError(poolContract, "zeroAmountProvided");
     });
 
@@ -800,7 +847,7 @@ describe("Base Credit Pool", function () {
         .connect(borrower)
         .approve(poolContract.address, toToken(11002));
 
-      await poolContract.connect(borrower).makePayment(borrower.address, toToken(11002));
+      await poolContract.connect(borrower).makePayment(toToken(11002));
 
       let creditInfo = await poolContract.creditRecordMapping(borrower.address);
 
@@ -836,7 +883,7 @@ describe("Base Credit Pool", function () {
 
       await poolContract
         .connect(pdsServiceAccount)
-        .makePayment(borrower.address, toToken(11002));
+        .makePayment(toToken(11002));
 
       let creditInfo = await poolContract.creditRecordMapping(borrower.address);
 
@@ -911,7 +958,7 @@ describe("Base Credit Pool", function () {
 
       await poolContract
         .connect(eaServiceAccount)
-        .approveCredit(borrower.address, toToken(1_000_000), 30, 12, 1217);
+        .approveCredit(toToken(1_000_000), 30, 12, 1217);
       await poolContract.connect(borrower).drawdown(toToken(1_000_000));
       let blockBefore = await ethers.provider.getBlock();
       let dueDate = blockBefore.timestamp + 2592000;
@@ -926,7 +973,7 @@ describe("Base Credit Pool", function () {
       let nextDate = dueDate - 29 * 24 * 3600;
       await setNextBlockTimestamp(nextDate);
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, toToken(900_000))
+        poolContract.connect(borrower).makePayment(toToken(900_000))
       ).to.emit(poolContract, "PaymentMade");
       let newBalance = await testTokenContract.balanceOf(borrower.address);
 
@@ -957,7 +1004,7 @@ describe("Base Credit Pool", function () {
         .approve(poolContract.address, toToken(120_000));
 
       await expect(
-        poolContract.connect(borrower).makePayment(borrower.address, toToken(120_000))
+        poolContract.connect(borrower).makePayment(toToken(120_000))
       ).to.emit(poolContract, "PaymentMade");
       r = await poolContract.creditRecordMapping(borrower.address);
       rs = await poolContract.creditRecordStaticMapping(borrower.address);

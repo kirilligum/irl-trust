@@ -50,7 +50,10 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   /// Credit line request has been approved
   event CreditApproved(
     address indexed _approvedBorrower,
-    uint256 creditLimit,
+    uint256[] maxCreditPerPeriod,
+    uint256[] creditPeriods,
+    uint256[] maxRepayPerPeriod,
+    uint256[] repayPeriods, 
     uint256 intervalInDays,
     uint256 remainingPeriods,
     uint256 aprInBps
@@ -115,20 +118,42 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
 
   /**
   * @notice Approves the credit request with the terms provided.
-  * @param creditLimit the credit limit of the credit line
+  * @param maxCreditPerPeriod credit available per period
+  * @param creditPeriods duration of each credit period
+  * @param maxRepayPerPeriod max borrower can repay in a period
+  * @param repayPeriods duration of each repay period
   * @param intervalInDays the number of days in each pay cycle
   * @param remainingPeriods how many cycles are there before the credit line expires
   * @param aprInBps interest rate (APR) expressed in basis points, 1% is 100, 100% is 10000
   * @dev only Evaluation Agent can call
   */
   function approveCredit(
-    uint256 creditLimit,
+    uint256[] memory maxCreditPerPeriod,
+    uint256[] memory creditPeriods,
+    uint256[] memory maxRepayPerPeriod,
+    uint256[] memory repayPeriods, 
     uint256 intervalInDays,
     uint256 remainingPeriods,
     uint256 aprInBps
   ) public virtual override {
+    require(maxCreditPerPeriod.length == creditPeriods.length, "please math credit periods");
+    require(maxRepayPerPeriod.length == repayPeriods.length, "please math repay periods");
+    require(creditPeriods[0] > _maxWithdrawSchedule[_maxWithdrawSchedule.length - 1], "new credit periods must come after existing ones");
+    require(repayPeriods[0] > _maxRepaySchedule[_maxRepaySchedule.length - 1], "new repay periods must come after existing ones");
     _protocolAndPoolOn();
     onlyEAServiceAccount();
+    uint256 creditLimit = 0;
+    for (uint i=0; i < maxCreditPerPeriod.length;i++) {
+      if (i < maxCreditPerPeriod.length -1 ) {
+        require(creditPeriods[i] < creditPeriods[i+1], "please sort credit periods in ascending order" );
+        require(repayPeriods[i] < repayPeriods[i+1], "please sort repay periods in ascending order" );
+      }
+      _maxWithdrawSchedule.push(creditPeriods[i]);
+      _maxWithdrawInSchedule.push(maxCreditPerPeriod[i]);
+      _maxRepaySchedule.push(repayPeriods[i]);
+      _maxRepayInSchedule.push(maxRepayPerPeriod[i]);
+      creditLimit += maxCreditPerPeriod[i];
+    }
     _maxCreditLineCheck(creditLimit);
     BS.CreditRecordStatic memory crs = _getCreditRecordStatic(_approvedBorrower);
     crs.creditLimit = uint96(creditLimit);
@@ -140,7 +165,16 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     cr.remainingPeriods = uint16(remainingPeriods);
     _setCreditRecord(_approvedBorrower, _approveCredit(cr));
 
-    emit CreditApproved(_approvedBorrower, creditLimit, intervalInDays, remainingPeriods, aprInBps);
+    emit CreditApproved(
+      _approvedBorrower,
+      maxCreditPerPeriod,
+      creditPeriods,
+      maxRepayPerPeriod,
+      repayPeriods, 
+      intervalInDays,
+      remainingPeriods,
+      aprInBps
+    );
   }
 
   /**
@@ -274,6 +308,7 @@ returns (BS.CreditRecord memory cr)
 * @param intervalInDays duration of a payment cycle, typically 30 days
 * @param numOfPayments number of cycles for the credit line to be valid.
     */
+   /*
 function requestCredit(
   uint256 creditLimit,
 uint256 intervalInDays,
@@ -288,7 +323,7 @@ uint256 numOfPayments
     false
   );
 }
-
+*/
 /**
  * @notice initiation of a credit line
  * @param creditLimit the amount of the liquidity asset that the borrower obtains
@@ -342,8 +377,8 @@ return losses;
       return _creditRecordStaticMapping[account];
     }
 
-    function isApproved() external view virtual override returns (bool) {
-      if ((_creditRecordMapping[_approvedBorrower].state >= BS.CreditState.Approved)) return true;
+    function isApproved(address check) external view virtual override returns (bool) {
+      if ((_creditRecordMapping[check].state >= BS.CreditState.Approved)) return true;
       else return false;
     }
 
@@ -576,7 +611,17 @@ return losses;
 
       if (preApproved) {
         ncr = _approveCredit(ncr);
-        emit CreditApproved(_approvedBorrower, creditLimit, intervalInDays, remainingPeriods, aprInBps);
+
+      emit CreditApproved(
+        _approvedBorrower,
+        _maxWithdrawInSchedule,
+        _maxWithdrawSchedule,
+        _maxRepayInSchedule,
+        _maxRepaySchedule, 
+        intervalInDays,
+        remainingPeriods,
+        aprInBps
+      );
       } else ncr.state = BS.CreditState.Requested;
 
       _setCreditRecord(_approvedBorrower, ncr);
@@ -937,5 +982,12 @@ return losses;
     function onlyEAServiceAccount() internal view {
       if (msg.sender != _humaConfig.eaServiceAccount())
         revert Errors.evaluationAgentServiceAccountRequired();
+    }
+    function getWithdrawSchedule()
+    public view returns (uint256[] memory,  uint256[] memory) {
+      return (_maxWithdrawSchedule, _maxWithdrawInSchedule);
+    }
+    function getRepaySchedule() public view returns ( uint256[] memory,  uint256[] memory) {
+      return (_maxRepaySchedule, _maxRepayInSchedule);
     }
 }

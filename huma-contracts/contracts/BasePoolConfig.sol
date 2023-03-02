@@ -46,7 +46,7 @@ contract BasePoolConfig is Ownable, Initializable {
     uint256 _poolAprInBps;
     // the duration of a credit line without an initial drawdown
     uint256 _creditApprovalExpirationInSeconds;
-    
+    address _poolStarter;
 }
 
 struct AccruedIncome {
@@ -150,7 +150,8 @@ function initialize(
   string memory _poolName,
   address _poolToken,
   address _humaConfig,
-  address _feeManager
+  address _feeManager,
+  address _poolStarter
 
 ) external onlyOwner initializer {
   poolName = _poolName;
@@ -183,6 +184,7 @@ function initialize(
   _poolConfig._payPeriodInDays = 30;
   _poolConfig._receivableRequiredInBps = 10000;
   _poolConfig._poolAprInBps = 1500;
+  _poolConfig._poolStarter = _poolStarter;
 }
 
 /**
@@ -681,6 +683,12 @@ function withdrawalLockoutPeriodInSeconds() external view returns (uint256) {
 function onlyOwnerOrHumaMasterAdmin(address account) public view {
   if (account != owner() && account != humaConfig.owner()) {
     revert Errors.permissionDeniedNotAdmin();
+  }
+}
+
+function onlyOwnerOrHumaMasterAdminOrPoolStarter(address account) public view returns (bool) {
+  if (account != owner() && account != humaConfig.owner() && account != _poolConfig._poolStarter) {
+    revert Errors.notOwnerAdminOrStarter();
   }
 }
 

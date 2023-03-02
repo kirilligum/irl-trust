@@ -53,6 +53,9 @@ async function deployContracts(
     ethers.utils.parseUnits('100','ether'),
     ethers.utils.parseUnits('200','ether'),
   ];
+  // Deploy Pool Starter
+  const PoolStarter = await ethers.getContractFactory("PoolStarter")
+  const poolStarter = await PoolStarter.deploy()
   // Deploy EvaluationAgentNFT
   const EvaluationAgentNFT = await ethers.getContractFactory("EvaluationAgentNFT");
   eaNFTContract = await EvaluationAgentNFT.deploy();
@@ -137,13 +140,15 @@ async function deployContracts(
     "Base Credit Pool",
     hdtContractOne.address,
     humaConfigContract.address,
-    feeManagerContract.address
+    feeManagerContract.address,
+    poolStarter.address
   );
   await poolConfigTwo.initialize(
     "Base Credit Pool 2",
     hdtContractTwo.address,
     humaConfigContract.address,
-    feeManagerContract.address
+    feeManagerContract.address,
+    poolStarter.address
   );
 
   // Deploy pool contract
@@ -206,9 +211,9 @@ async function deployContracts(
   console.log('pool Config Transfered ownership')
   // Config rewards and requirements for poolOwner and EA, make initial deposit, and enable pool
   await poolConfigOne.connect(poolOwner).setPoolLiquidityCap(toToken(1_000_000_000));
-  await poolConfigOne.connect(poolOwner).setPoolOwnerRewardsAndLiquidity(625, 10);
+  await poolConfigOne.connect(poolOwner).setPoolOwnerRewardsAndLiquidity(0, 0);
   await poolConfigTwo.connect(poolOwner).setPoolLiquidityCap(toToken(1_000_000_000));
-  await poolConfigTwo.connect(poolOwner).setPoolOwnerRewardsAndLiquidity(625, 10);
+  await poolConfigTwo.connect(poolOwner).setPoolOwnerRewardsAndLiquidity(0, 0);
   console.log('liquidity caps and rewards configured')
   let eaNFTTokenId;
   // Mint EANFT to the ea
@@ -225,13 +230,13 @@ async function deployContracts(
   let s = await poolConfigOne.getPoolSummary();
   await poolConfigTwo.connect(poolOwner).setEvaluationAgent(eaNFTTokenId, evaluationAgent.address);
 
-  await poolConfigOne.connect(poolOwner).setEARewardsAndLiquidity(1875, 10);
+  await poolConfigOne.connect(poolOwner).setEARewardsAndLiquidity(0, 0);
 
   await poolConfigOne.connect(poolOwner).setPoolOwnerTreasury(poolOwnerTreasury.address);
   await poolConfigOne.connect(poolOwner).addPoolOperator(poolOwner.address);
   await poolConfigOne.connect(poolOwner).addPoolOperator(poolOperator.address);
 
-  await poolConfigTwo.connect(poolOwner).setEARewardsAndLiquidity(1875, 10);
+  await poolConfigTwo.connect(poolOwner).setEARewardsAndLiquidity(0, 0);
 
   await poolConfigTwo.connect(poolOwner).setPoolOwnerTreasury(poolOwnerTreasury.address);
   await poolConfigTwo.connect(poolOwner).addPoolOperator(poolOwner.address);
@@ -268,7 +273,7 @@ async function deployContracts(
   console.log('initial deposit evalAgent pool 2')
 
   console.log('initial deposits made')
-  await expect(poolContractOne.connect(poolOwner).enablePool()).to.emit(
+  /*await expect(poolContractOne.connect(poolOwner).enablePool()).to.emit(
     poolContractOne,
     "PoolEnabled"
   );
@@ -276,7 +281,7 @@ async function deployContracts(
     poolContractTwo,
     "PoolEnabled"
   );
-  console.log('pools enabled')
+  */
 
   await poolConfigOne.connect(poolOwner).setAPR(1217);
   await poolConfigOne.connect(poolOwner).setMaxCreditLine(toToken(10_000_000));
@@ -285,6 +290,7 @@ async function deployContracts(
   console.log('Aprs and max credit lines')
 
   return {
+    starter: {poolStarter},
     poolA: {hdtContractOne, poolConfigOne, poolContract:poolContractOne, poolImplOne, poolProxyOne},
     poolB: {hdtContractTwo, poolConfigTwo, poolContract:poolContractTwo, poolImplOne, poolProxyTwo},
     config: {humaConfigContract, feeManagerContract, testTokenContract, eaNFTContract},

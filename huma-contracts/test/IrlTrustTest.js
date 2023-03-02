@@ -10,6 +10,7 @@ const {
 } = require("./BaseTest");
 
 describe("Base Credit Pool", function () {
+  let starter
   let poolA
   let poolB
   let config
@@ -17,12 +18,19 @@ describe("Base Credit Pool", function () {
   let signers
   before(async function () {
     (
-      {poolA, poolB, config, token, signers } = await deployContracts()
+      {starter, poolA, poolB, config, token, signers } = await deployContracts()
     )
     await poolA.poolConfigOne.connect(signers.poolOwner).setWithdrawalLockoutPeriod(90);
     await poolA.poolConfigOne.connect(signers.poolOwner).setPoolDefaultGracePeriod(60);
     await poolB.poolConfigTwo.connect(signers.poolOwner).setWithdrawalLockoutPeriod(90);
     await poolB.poolConfigTwo.connect(signers.poolOwner).setPoolDefaultGracePeriod(60);
+
+    await starter.poolStarter.connect(signers.lenderA).enablePool(
+      poolA.poolContract.address
+    )
+    await starter.poolStarter.connect(signers.lenderB).enablePool(
+      poolB.poolContract.address
+    )
   });
 
   beforeEach(async function () {

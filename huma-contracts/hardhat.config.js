@@ -346,6 +346,15 @@ module.exports = {
                     },
                 },
             },
+            {
+                version: "0.6.5",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 200,
+                    },
+                },
+            },
         ],
     },
     ovm: {

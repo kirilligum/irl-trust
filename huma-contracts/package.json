@@ -3,25 +3,25 @@
   "version": "1.0.0",
   "license": "MIT",
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
-    "@nomiclabs/hardhat-ethers": "^2.1.1",
-    "@nomiclabs/hardhat-etherscan": "^3.1.0",
-    "@openzeppelin/hardhat-upgrades": "^1.20.0",
-    "@tenderly/hardhat-tenderly": "^1.1.6",
-    "chai": "^4.3.6",
-    "ethers": "^5.7.0",
-    "hardhat-abi-exporter": "^2.10.0",
-    "hardhat-contract-sizer": "^2.6.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@nomiclabs/hardhat-etherscan": "^3.1.6",
+    "@openzeppelin/hardhat-upgrades": "^1.22.1",
+    "@tenderly/hardhat-tenderly": "^1.6.1",
+    "chai": "^4.3.7",
+    "ethers": "^5.7.1",
+    "hardhat-abi-exporter": "^2.10.1",
+    "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.9",
     "hardhat-prettier": "^0.0.1",
-    "husky": "^8.0.1",
+    "husky": "^8.0.3",
     "node-watch": "^0.7.3",
-    "prettier": "^2.7.1",
-    "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "prettier": "^2.8.4",
+    "prettier-plugin-solidity": "^1.1.3",
     "qrcode-terminal": "^0.12.0",
-    "solhint": "^3.3.7",
+    "solhint": "^3.4.0",
     "solidity-coverage": "^0.8.2",
-    "typescript": "^4.8.2"
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "build": "hardhat compile",
@@ -36,9 +36,13 @@
     "coverage": "hardhat coverage --network hardhat"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3",
-    "@openzeppelin/contracts-upgradeable": "^4.7.3",
-    "dotenv": "^16.0.2",
-    "hardhat": "^2.11.1"
+    "@gnosis.pm/mock-contract": "^4.0.0",
+    "@openzeppelin/contracts": "^4.8.1",
+    "@openzeppelin/contracts-upgradeable": "^4.8.1",
+    "@safe-global/safe-apps-sdk": "^7.10.0",
+    "@safe-global/safe-core-sdk": "^3.3.2",
+    "@safe-global/safe-ethers-lib": "^1.9.2",
+    "dotenv": "^16.0.3",
+    "hardhat": "^2.12.7"
   }
 }

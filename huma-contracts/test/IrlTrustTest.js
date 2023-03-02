@@ -63,6 +63,7 @@ describe("Base Credit Pool", function () {
       expect(poolATokens).to.be.equal(0)
       const poolBTokens = await token.testTokenContract.balanceOf(poolB.poolContract.address)
       expect(poolBTokens).to.be.equal(0)
+
       const depositAmount = toToken(2_000_000)
       await token.testTokenContract.connect(signers.lenderA).approve(poolA.poolContract.address, depositAmount);
       await token.testTokenContract.connect(signers.lenderA).approve(poolB.poolContract.address, depositAmount);
@@ -75,6 +76,7 @@ describe("Base Credit Pool", function () {
       expect(poolATokensTwo).to.be.equal(depositAmount)
       const poolBTokensTwo = await token.testTokenContract.balanceOf(poolB.poolContract.address)
       expect(poolBTokensTwo).to.be.equal(depositAmount.add(depositAmount))
+      
 
 
 

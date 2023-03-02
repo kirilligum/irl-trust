@@ -15,6 +15,11 @@
         "internalType": "address[]",
         "name": "executors",
         "type": "address[]"
+      },
+      {
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",

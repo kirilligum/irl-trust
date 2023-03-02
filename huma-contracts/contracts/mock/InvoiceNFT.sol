@@ -80,7 +80,7 @@ contract InvoiceNFT is ERC721URIStorage, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) internal override {
+    ) internal  {
         if (from != address(0)) {
             uint256 index = _tokenIdIndexes[tokenId];
             if (index > 0) {

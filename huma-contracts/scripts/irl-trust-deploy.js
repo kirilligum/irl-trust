@@ -2,8 +2,9 @@ const {ethers, network} = require("hardhat");
 const {expect} = require("chai");
 const {BigNumber: BN} = require("ethers");
 const {hasRestParameter} = require("typescript");
-
+const { getSafeTemplate } = require('./gnosis-safe-mock.js')
 function toBN(number, decimals) {
+
   return BN.from(number).mul(BN.from(10).pow(BN.from(decimals)));
 }
 
@@ -29,6 +30,26 @@ async function deployContracts(
     eaServiceAccount,
     pdsServiceAccount,
   ] = await ethers.getSigners()
+/*
+  const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+  const Wallet = new ethersPure.Wallet('0x6b0ab911e8303f5e0b17f956234f842438d966510e992262f12c03ce9208af60', provider)
+
+	const ethAdapter = new EthersAdapter({ethersPure, signerOrProvider: Wallet}); //3
+	const safeFactory = await SafeFactory.create({ ethAdapter }); //4
+	const safeSdkPoolA = await safeFactory.deploySafe({ safeAccountConfig: { threshold: 2, owners: [lenderA.address, borrowerA.address] }}); //5
+	const safeSdkPoolB = await safeFactory.deploySafe({ safeAccountConfig: { threshold: 3, owners: [lenderA.address, lenderB.address, borrowerA.address] }}); //5
+*/
+  const template = await getSafeTemplate()
+  const safeOneSetup = await template.setup(
+    [lenderA.address, borrowerA.address], //address[] calldata _owners,
+    2, //uint256 _threshold,
+    ethers.constants.AddressZero,//address to,
+    "0x",//bytes calldata data,
+    ethers.constants.AddressZero,//address fallbackHandler,
+    ethers.constants.AddressZero,//address paymentToken,
+    0,//uint256 payment,
+    ethers.constants.AddressZero//address payable paymentReceiver
+  )
   const fees = [toToken(1000), 100, toToken(2000), 100, 0]
   const principalRateInBps = 0
   const isReceivableContractFlag = false

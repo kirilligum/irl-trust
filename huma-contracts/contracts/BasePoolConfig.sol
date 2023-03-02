@@ -177,8 +177,8 @@ function initialize(
   // these values when setting up the pools. Setting these default values to avoid
   // strange behaviors when the pool owner missed setting up these configurations.
   // _liquidityCap, _maxCreditLine, _creditApprovalExpirationInSeconds are left at 0.
-  _poolConfig._rewardRateInBpsForEA = 100;
-  _poolConfig._rewardRateInBpsForPoolOwner = 100;
+  _poolConfig._rewardRateInBpsForEA = 0;
+  _poolConfig._rewardRateInBpsForPoolOwner = 0;
   _poolConfig._liquidityRateInBpsByEA = 0;
   _poolConfig._liquidityRateInBpsByPoolOwner = 0;
   _poolConfig._payPeriodInDays = 30;

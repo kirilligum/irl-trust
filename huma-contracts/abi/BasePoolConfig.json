@@ -26,6 +26,11 @@
   },
   {
     "inputs": [],
+    "name": "notOwnerAdminOrStarter",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "notPool",
     "type": "error"
   },
@@ -936,6 +941,11 @@
         "internalType": "address",
         "name": "_feeManager",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_poolStarter",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -1004,6 +1014,25 @@
     ],
     "name": "onlyOwnerOrHumaMasterAdmin",
     "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "onlyOwnerOrHumaMasterAdminOrPoolStarter",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },

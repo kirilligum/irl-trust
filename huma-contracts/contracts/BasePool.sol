@@ -220,9 +220,9 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
    * @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
    */
   function enablePool() external virtual override {
-    _onlyOwnerOrHumaMasterAdmin();
+    _onlyOwnerOrHumaMasterAdminOrPoolStarter();
 
-    //_poolConfig.checkLiquidityRequirement();
+    _poolConfig.checkLiquidityRequirement();
 
     _status = PoolStatus.On;
     emit PoolEnabled(msg.sender);
@@ -290,7 +290,7 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
   }
 
   /// Reports if the given account has been approved as a lender for this pool
-  function isApprovedLender(address account) external view virtual override returns (bool) {
+  function isApprovedLender(address account) public view virtual override returns (bool) {
     return _approvedLenders[account];
   }
 
@@ -366,6 +366,9 @@ function _onlyApprovedLender(address lender) internal view {
 /// "Modifier" function that limits access to pool owner or protocol owner
 function _onlyOwnerOrHumaMasterAdmin() internal view {
   _poolConfig.onlyOwnerOrHumaMasterAdmin(msg.sender);
+}
+function _onlyOwnerOrHumaMasterAdminOrPoolStarter() internal view {
+  _poolConfig.onlyOwnerOrHumaMasterAdminOrPoolStarter(msg.sender);
 }
 
 /// "Modifier" function that limits access to pool operators only

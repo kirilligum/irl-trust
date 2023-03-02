@@ -161,6 +161,11 @@
   },
   {
     "inputs": [],
+    "name": "notOwnerAdminOrStarter",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "notPauser",
     "type": "error"
   },

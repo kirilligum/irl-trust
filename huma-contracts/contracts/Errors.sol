@@ -27,6 +27,7 @@ contract Errors {
     error notPool(); // 0x26d29bbf
     error drawdownFunctionUsedInsteadofDrawdownWithReceivable(); // 0x7e737537
     error notNFTOwner(); // 0x091a5762
+    error notOwnerAdminOrStarter(); // 0x5a22d570
 
     // system config
     error defaultGracePeriodLessThanMinAllowed(); // 0xa733ff9c

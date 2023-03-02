@@ -5,20 +5,38 @@ import "./Borrower.css";
 
 function Borrower() {
   const [loanName, setLoanName] = useState("");
-  const [address, setAddress] = useState("");
   const [reason, setReason] = useState("");
   const [amount, setAmount] = useState("");
   const [term, setTerm] = useState("Minutes");
   const [length, setLength] = useState(0);
 
+  const [addressList, setAddressList] = useState([{ address: "" }]);
+
+  const handleAddressAdd = () => {
+    setAddressList([...addressList, { address: "" }]);
+  };
+
+  const handleAddressRemove = (index) => {
+    const list = [...addressList];
+    list.splice(index, 1);
+    setAddressList(list);
+  };
+
+  const handleAddressChange = (e, index) => {
+    const { name, value } = e.target;
+    const list = [...addressList];
+    list[index][name] = value;
+    setAddressList(list);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(loanName);
-    console.log(address);
     console.log(reason);
     console.log(amount);
     console.log(term);
     console.log(length);
+    console.log(addressList);
   };
 
   return (
@@ -33,18 +51,6 @@ function Borrower() {
             placeholder="Unique loan name"
             className="input input-bordered"
             onChange={(e) => setLoanName(e.target.value)}
-          />
-        </label>
-
-        <br />
-
-        <label className="input-group form-item">
-          <span>Address</span>
-          <input
-            type="text"
-            placeholder="0xabc..."
-            className="input input-bordered"
-            onChange={(e) => setAddress(e.target.value)}
           />
         </label>
 
@@ -111,7 +117,46 @@ function Borrower() {
 
         <br />
 
-        <button className="btn btn-outline">random</button>
+        <label>Potential Lender(s)</label>
+        {addressList.map((singleAddress, index) => (
+          <div key={index} className="address">
+            <div className="first-division">
+              <input
+                name="address"
+                type="text"
+                placeholder="0x000..."
+                className="input input-bordered input-primary w-full max-w-xs"
+                required
+                value={singleAddress.address}
+                onChange={(e) => handleAddressChange(e, index)}
+              />
+            </div>
+            <div className="second-division">
+              {addressList.length > 1 && (
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={() => handleAddressRemove(index)}
+                >
+                  <span>Remove</span>
+                </button>
+              )}
+            </div>
+            {addressList.length - 1 === index && (
+              <button
+                type="button"
+                className="add-btn"
+                onClick={handleAddressAdd}
+              >
+                <span>Add Lender</span>
+              </button>
+            )}
+          </div>
+        ))}
+
+        <br />
+
+        <button className="btn btn-outline">Submit</button>
       </form>
     </div>
   );

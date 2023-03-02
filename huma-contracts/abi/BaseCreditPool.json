@@ -66,11 +66,6 @@
   },
   {
     "inputs": [],
-    "name": "maxRepayInPeriodExceeded",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "onlyBorrowerOrEACanReduceCreditLine",
     "type": "error"
   },
@@ -174,27 +169,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256[]",
-        "name": "maxCreditPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "creditPeriods",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "maxRepayPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "repayPeriods",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "endDate",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -660,24 +637,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256[]",
-        "name": "maxCreditPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "creditPeriods",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "maxRepayPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "repayPeriods",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "newEndDate",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -898,35 +860,27 @@
   },
   {
     "inputs": [],
-    "name": "getRepaySchedule",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "getWithdrawSchedule",
     "outputs": [
       {
-        "internalType": "uint256[]",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint256[]"
+        "type": "uint256"
       },
       {
-        "internalType": "uint256[]",
+        "internalType": "uint256",
         "name": "",
-        "type": "uint256[]"
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -950,24 +904,19 @@
         "type": "address[]"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxWithdrawSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "maxWithdrawPeriodLength",
+        "type": "uint256"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxWithdrawInSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "maxWithdrawAmountPerPeriod",
+        "type": "uint256"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxRepaySchedule",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "maxRepayInSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "endDate",
+        "type": "uint256"
       }
     ],
     "name": "initialize",

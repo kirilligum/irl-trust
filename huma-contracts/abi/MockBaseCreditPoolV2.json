@@ -472,24 +472,19 @@
         "type": "address[]"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxWithdrawSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "maxWithdrawPeriodLength",
+        "type": "uint256"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxWithdrawInSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "maxWithdrawAmountPerPeriod",
+        "type": "uint256"
       },
       {
-        "internalType": "uint256[]",
-        "name": "maxRepaySchedule",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "maxRepayInSchedule",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "endDate",
+        "type": "uint256"
       }
     ],
     "name": "initialize",

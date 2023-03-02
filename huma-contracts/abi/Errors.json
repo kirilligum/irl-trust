@@ -136,11 +136,6 @@
   },
   {
     "inputs": [],
-    "name": "maxRepayInPeriodExceeded",
-    "type": "error"
-  },
-  {
-    "inputs": [],
     "name": "minPrincipalPaymentRateSettingTooHigh",
     "type": "error"
   },

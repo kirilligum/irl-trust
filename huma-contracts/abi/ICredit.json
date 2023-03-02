@@ -2,24 +2,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256[]",
-        "name": "maxCreditPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "creditPeriods",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "maxRepayPerPeriod",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "repayPeriods",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "newEndDate",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",

@@ -1,0 +1,33 @@
+graph TB
+  subgraph borrowers
+  b1[\"b1: nephew"/]
+  b2[\"b2: uncle's friend's niece"/]
+  b3[\"b3: bot"/]
+  end
+  subgraph HUMA pools
+  p1(("p1 <br/> $100 <br/>10%"))
+  p2(("p2 <br/> $100 <br/>10%"))
+  p3(("p3: bot <br/> $1000 <br/>10%"))
+  end
+  subgraph lenders
+    l1[/"l1: uncle"\]
+    l2[/"l2: uncle's friend"\]
+    l3[/"l3: bot"\]
+  end
+  l1==>|"lended $100<br/>withdrew $110"|p1
+  l1==>|"lended $50<br/>withdrew $55"|p2
+  l2==>|"lended $50<br/>withdrew $55"|p2
+  l1o--o|"edge: $110"|l2
+  p1==>|"borrowed $100<br/>repayed $110"|b1
+  p2==>|"borrowed $100<br/>repayed $110"|b2
+  l1-...-|"score: 110 <br/>direct"|b1
+  l1-...-|"score: 55 <br/>direct"|b2
+  l2-...-|"referral<br/>score: 82.5 <br/>indirect"|b1
+  l2-...-|"score: 55 <br/>direct"|b2
+  l1-...-|"sybil attack<br/>score: 0 <br/>disconnected"|b3
+  l2-...-|"sybil attack<br/>score: 0 <br/>disconnected"|b3
+  l3==>|"lended $1000<br/>withdrew $1100"|p3
+  p3==>|"borrowed $1000<br/>withdrew $1100"|b3
+  l3-...-|"score: 1100 <br/>"|b3
+  linkStyle 8 stroke:#0e0
+  linkStyle 10,11 stroke:#e00

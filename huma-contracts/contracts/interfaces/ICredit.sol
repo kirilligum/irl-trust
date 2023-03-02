@@ -5,10 +5,7 @@ import {BaseStructs as BS} from "../libraries/BaseStructs.sol";
 interface ICredit {
     /// Approves a credit line request
     function approveCredit(
-    uint256[] memory maxCreditPerPeriod,
-    uint256[] memory creditPeriods,
-    uint256[] memory maxRepayPerPeriod,
-    uint256[] memory repayPeriods, 
+        uint256 newEndDate,
         uint256 intervalInDays,
         uint256 remainingPeriods,
         uint256 aprInBps

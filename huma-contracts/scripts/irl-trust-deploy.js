@@ -30,15 +30,10 @@ async function deployContracts(
     eaServiceAccount,
     pdsServiceAccount,
   ] = await ethers.getSigners()
-/*
-  const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
-  const Wallet = new ethersPure.Wallet('0x6b0ab911e8303f5e0b17f956234f842438d966510e992262f12c03ce9208af60', provider)
-
-	const ethAdapter = new EthersAdapter({ethersPure, signerOrProvider: Wallet}); //3
-	const safeFactory = await SafeFactory.create({ ethAdapter }); //4
-	const safeSdkPoolA = await safeFactory.deploySafe({ safeAccountConfig: { threshold: 2, owners: [lenderA.address, borrowerA.address] }}); //5
-	const safeSdkPoolB = await safeFactory.deploySafe({ safeAccountConfig: { threshold: 3, owners: [lenderA.address, lenderB.address, borrowerA.address] }}); //5
-*/
+  
+  const maxWithdrawPeriodLength = 3600
+  const maxWithdrawAmountPerPeriod = toToken(1_000)
+  const endDate = Math.floor(new Date().getTime()/ 1000)
   const template = await getSafeTemplate()
   const safeOneSetup = await template.setup(
     [lenderA.address, borrowerA.address], //address[] calldata _owners,
@@ -53,27 +48,6 @@ async function deployContracts(
   const fees = [toToken(1000), 100, toToken(2000), 100, 0]
   const principalRateInBps = 0
   const isReceivableContractFlag = false
-  let maxWithdrawSchedule = [
-    Math.floor(new Date().getTime() / 1000)+3600,
-    Math.floor((new Date().getTime() / 1000))+7200,
-    Math.floor((new Date().getTime() / 1000))+10800,
-  ]
-  console.log(maxWithdrawSchedule)
-  const maxWithdrawInSchedule = [
-    ethers.utils.parseUnits('200','ether'),
-    ethers.utils.parseUnits('100','ether'),
-    ethers.utils.parseUnits('50','ether'),
-  ];
-  const maxRepaySchedule = [
-    Math.floor((new Date().getTime() / 1000))+7200,
-    Math.floor((new Date().getTime() / 1000))+10800,
-    Math.floor((new Date().getTime() / 1000))+14400,
-  ]
-  const maxRepayInSchedule = [
-    ethers.utils.parseUnits('50','ether'),
-    ethers.utils.parseUnits('100','ether'),
-    ethers.utils.parseUnits('200','ether'),
-  ];
   // Deploy Pool Starter
   const PoolStarter = await ethers.getContractFactory("PoolStarter")
   const poolStarter = await PoolStarter.deploy()
@@ -203,19 +177,17 @@ async function deployContracts(
     poolConfigOne.address,
     borrowerA.address,
     [lenderA.address],
-    maxWithdrawSchedule,
-    maxWithdrawInSchedule,
-    maxRepaySchedule,
-    maxRepayInSchedule
+    maxWithdrawPeriodLength,
+    maxWithdrawAmountPerPeriod,
+    endDate
   );
   await poolContractTwo.initialize(
     poolConfigTwo.address,
     borrowerB.address,
     [lenderA.address, lenderB.address],
-    maxWithdrawSchedule,
-    maxWithdrawInSchedule,
-    maxRepaySchedule,
-    maxRepayInSchedule
+    maxWithdrawPeriodLength,
+    maxWithdrawAmountPerPeriod,
+    endDate
   );
   console.log('initialized')
   await poolContractOne.deployed();

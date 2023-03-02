@@ -52,10 +52,9 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
     address poolConfigAddr,
     address borrower,
     address[] memory lenders,
-    uint256[] memory maxWithdrawSchedule,
-    uint256[] memory maxWithdrawInSchedule,
-    uint256[] memory maxRepaySchedule,
-    uint256[] memory maxRepayInSchedule
+    uint256 maxWithdrawPeriodLength,
+    uint256 maxWithdrawAmountPerPeriod,
+    uint256 endDate
   ) external initializer {
     _poolConfig = BasePoolConfig(poolConfigAddr);
     _updateCoreData();
@@ -69,10 +68,10 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
 
     // All pools are off when initiated, will turn on after admins' initial deposits
     _status = PoolStatus.Off;
-     _maxWithdrawSchedule = maxWithdrawSchedule;
-     _maxWithdrawInSchedule = maxWithdrawInSchedule;
-     _maxRepaySchedule = maxRepaySchedule;
-     _maxRepayInSchedule = maxRepayInSchedule;
+
+     _maxWithdrawPeriodLength = maxWithdrawPeriodLength;
+     _maxWithdrawAmountPerPeriod = maxWithdrawAmountPerPeriod;
+     _endDate = endDate;
   }
 
   //********************************************/
@@ -225,6 +224,7 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
     _poolConfig.checkLiquidityRequirement();
 
     _status = PoolStatus.On;
+    _startDate = block.timestamp;
     emit PoolEnabled(msg.sender);
   }
 

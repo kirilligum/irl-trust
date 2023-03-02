@@ -50,10 +50,7 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   /// Credit line request has been approved
   event CreditApproved(
     address indexed _approvedBorrower,
-    uint256[] maxCreditPerPeriod,
-    uint256[] creditPeriods,
-    uint256[] maxRepayPerPeriod,
-    uint256[] repayPeriods, 
+    uint256 endDate,
     uint256 intervalInDays,
     uint256 remainingPeriods,
     uint256 aprInBps
@@ -118,59 +115,32 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
 
   /**
   * @notice Approves the credit request with the terms provided.
-  * @param maxCreditPerPeriod credit available per period
-  * @param creditPeriods duration of each credit period
-  * @param maxRepayPerPeriod max borrower can repay in a period
-  * @param repayPeriods duration of each repay period
+  * @param newEndDate new expiration date
   * @param intervalInDays the number of days in each pay cycle
   * @param remainingPeriods how many cycles are there before the credit line expires
   * @param aprInBps interest rate (APR) expressed in basis points, 1% is 100, 100% is 10000
   * @dev only Evaluation Agent can call
   */
   function approveCredit(
-    uint256[] memory maxCreditPerPeriod,
-    uint256[] memory creditPeriods,
-    uint256[] memory maxRepayPerPeriod,
-    uint256[] memory repayPeriods, 
+    uint256 newEndDate,
     uint256 intervalInDays,
     uint256 remainingPeriods,
     uint256 aprInBps
   ) public virtual override {
-    require(maxCreditPerPeriod.length == creditPeriods.length, "please math credit periods");
-    require(maxRepayPerPeriod.length == repayPeriods.length, "please math repay periods");
-    require(creditPeriods[0] > _maxWithdrawSchedule[_maxWithdrawSchedule.length - 1], "new credit periods must come after existing ones");
-    require(repayPeriods[0] > _maxRepaySchedule[_maxRepaySchedule.length - 1], "new repay periods must come after existing ones");
     _protocolAndPoolOn();
     onlyEAServiceAccount();
-    uint256 creditLimit = 0;
-    for (uint i=0; i < maxCreditPerPeriod.length;i++) {
-      if (i < maxCreditPerPeriod.length -1 ) {
-        require(creditPeriods[i] < creditPeriods[i+1], "please sort credit periods in ascending order" );
-        require(repayPeriods[i] < repayPeriods[i+1], "please sort repay periods in ascending order" );
-      }
-      _maxWithdrawSchedule.push(creditPeriods[i]);
-      _maxWithdrawInSchedule.push(maxCreditPerPeriod[i]);
-      _maxRepaySchedule.push(repayPeriods[i]);
-      _maxRepayInSchedule.push(maxRepayPerPeriod[i]);
-      creditLimit += maxCreditPerPeriod[i];
-    }
-    _maxCreditLineCheck(creditLimit);
     BS.CreditRecordStatic memory crs = _getCreditRecordStatic(_approvedBorrower);
-    crs.creditLimit = uint96(creditLimit);
+    crs.creditLimit += uint96(_maxWithdrawAmountPerPeriod*((newEndDate - _endDate) / _maxWithdrawAmountPerPeriod));
+    _maxCreditLineCheck(crs.creditLimit);
     crs.aprInBps = uint16(aprInBps);
     crs.intervalInDays = uint16(intervalInDays);
     _creditRecordStaticMapping[_approvedBorrower] = crs;
 
     BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
-    cr.remainingPeriods = uint16(remainingPeriods);
     _setCreditRecord(_approvedBorrower, _approveCredit(cr));
-
     emit CreditApproved(
       _approvedBorrower,
-      maxCreditPerPeriod,
-      creditPeriods,
-      maxRepayPerPeriod,
-      repayPeriods, 
+      newEndDate,
       intervalInDays,
       remainingPeriods,
       aprInBps
@@ -465,28 +435,17 @@ return losses;
         _updateBorrowSchedule(borrowAmount);
       }
     }
-    /**
-    *
-    */
+
     function _updateBorrowSchedule(
       uint256 borrowAmount
     ) internal {
-      if (block.timestamp > _maxWithdrawSchedule[0]) {
-        if(_maxWithdrawInSchedule[0] > 0) {
-          _maxWithdrawInSchedule[1] += _maxWithdrawInSchedule[0];
+      if (block.timestamp > _endDate) {
+        uint256 elapsedSeconds = block.timestamp - _startDate;
+        uint256 periodsElapsed = elapsedSeconds / _maxWithdrawPeriodLength;
+        if (_totalWithdrawn+borrowAmount > periodsElapsed * _maxWithdrawAmountPerPeriod) {
+          revert Errors.creditInPeriodExceeded();
         }
-
-        for (uint i = 0; i<_maxWithdrawSchedule.length-1; i++){
-            _maxWithdrawSchedule[i] = _maxWithdrawSchedule[i+1];
-            _maxWithdrawInSchedule[i] = _maxWithdrawInSchedule[i+1];
-        }
-        _maxWithdrawSchedule.pop();
-        _maxWithdrawInSchedule.pop();
       }
-
-      uint256 currentTermAmount = _maxWithdrawInSchedule[0];
-      if (borrowAmount > _maxWithdrawInSchedule[0]) revert Errors.creditInPeriodExceeded();
-      _maxWithdrawInSchedule[0] -= borrowAmount;
     }
 
     /**
@@ -557,7 +516,7 @@ return losses;
 
       // Transfer funds to the _borrower
       _underlyingToken.safeTransfer(_approvedBorrower, netAmountToBorrower);
-
+      _totalWithdrawn += borrowAmount;
       return netAmountToBorrower;
     }
 
@@ -614,10 +573,7 @@ return losses;
 
       emit CreditApproved(
         _approvedBorrower,
-        _maxWithdrawInSchedule,
-        _maxWithdrawSchedule,
-        _maxRepayInSchedule,
-        _maxRepaySchedule, 
+        _endDate,
         intervalInDays,
         remainingPeriods,
         aprInBps
@@ -802,7 +758,6 @@ return losses;
 
       if (amountToCollect > 0 && paymentStatus == BS.PaymentStatus.NotReceived) {
         // Transfer assets from the _borrower to pool locker
-        _checkAndUpdateMaxRepaySchedule(amount);
         _underlyingToken.safeTransferFrom(_approvedBorrower, address(this), amountToCollect);
         emit PaymentMade(
           _approvedBorrower,
@@ -818,27 +773,6 @@ return losses;
       return (amountToCollect, amountToCollect >= payoffAmount, false);
     }
 
-    function _checkAndUpdateMaxRepaySchedule(
-      uint256 amount
-    ) internal {
-      if (block.timestamp > _maxRepaySchedule[0]) {
-        if(_maxRepayInSchedule[0] > 0) {
-          _maxRepayInSchedule[1] += _maxRepayInSchedule[0];
-        }
-
-        for (uint i = 0; i<_maxRepaySchedule.length-1; i++){
-            _maxRepaySchedule[i] = _maxRepaySchedule[i+1];
-            _maxRepayInSchedule[i] = _maxRepayInSchedule[i+1];
-        }
-        _maxRepaySchedule.pop();
-        _maxRepayInSchedule.pop();
-      }
-
-      uint256 currentTermAmount = _maxWithdrawInSchedule[0];
-      if ( amount > _maxWithdrawInSchedule[0]) revert Errors.maxRepayInPeriodExceeded();
-      _maxWithdrawInSchedule[0] -= amount;
-
-    }
 
     /**
     * @notice Recovers amount when a payment is paid towards a defaulted account.
@@ -984,10 +918,11 @@ return losses;
         revert Errors.evaluationAgentServiceAccountRequired();
     }
     function getWithdrawSchedule()
-    public view returns (uint256[] memory,  uint256[] memory) {
-      return (_maxWithdrawSchedule, _maxWithdrawInSchedule);
-    }
-    function getRepaySchedule() public view returns ( uint256[] memory,  uint256[] memory) {
-      return (_maxRepaySchedule, _maxRepayInSchedule);
+      public view returns (uint256,uint256,uint256,uint256) {
+        return ( _maxWithdrawPeriodLength,
+         _maxWithdrawAmountPerPeriod,
+         _startDate,
+         _endDate
+        );
     }
 }

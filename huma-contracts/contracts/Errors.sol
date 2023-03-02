@@ -57,7 +57,6 @@ contract Errors {
     error creditLineNotInStateForDrawdown(); // 0x4ff95a6d
     error creditLineExceeded(); // 0xef7d66ff
     error creditInPeriodExceeded(); // 0xf49f9540
-    error maxRepayInPeriodExceeded();// 0xd49c17a8
     error creditLineAlreadyExists(); // 0x6c5805f2
     error creditLineGreatThanUpperLimit(); // 0xd8c27d2f
     error greaterThanMaxCreditLine(); // 0x8a754ae8
@@ -73,7 +72,7 @@ contract Errors {
     error receivableAssetMismatch(); // 0x41dbeec1
     error unsupportedReceivableAsset(); // 0xe60c383e
     error receivableAssetParamMismatch(); // 0x1400a0b4
-    error insufficientReceivableAmount(); // 0xf7f34854
+    error insufficientReceivableAmount(); // 0xf7f34854/
     error borrowingAmountLessThanPlatformFees(); // 0x97fde118
     error withdrawTooSoon(); // 0x67982472
     error paymentAlreadyProcessed(); // 0xfd6754cf

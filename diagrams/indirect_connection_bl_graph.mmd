@@ -1,0 +1,13 @@
+graph TB
+  subgraph borrowers
+  b1[\"b1: nephew"/]
+  b2[\"b2: uncle's friend's niece"/]
+  end
+  subgraph lenders
+    l1[/"l1: uncle"\]
+    l2[/"l2: uncle's friend"\]
+  end
+  l1---b1
+  l1---l2
+  l1---b2
+  l2---b2

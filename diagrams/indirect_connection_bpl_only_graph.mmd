@@ -1,0 +1,19 @@
+graph TB
+  subgraph borrowers
+  b1[\"b1: nephew"/]
+  b2[\"b2: uncle's friend's niece"/]
+  end
+  subgraph pools
+  p1(("p1: <br/> ($100)"))
+  p2(("p2: <br/> ($100)"))
+  end
+  subgraph lenders
+    l1[/"l1: uncle"\]
+    l2[/"l2: uncle's friend"\]
+  end
+  l1==>|"lend $100"|p1
+  l1==>|"lend $50"|p2
+  l2==>|"lend $50"|p2
+  l1o--o|"edge: $100"|l2
+  p1==>|"borrow $100"|b1
+  p2==>|"borrow $100"|b2

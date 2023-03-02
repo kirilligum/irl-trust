@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.triangle-out {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 0 10px;
+  border-color: transparent transparent transparent #007bff;
+  color: #00ff00;
+  align-items: center;
+  justify-items: center;
+}
+.triangle-in {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 10px 10px;
+  border-color: transparent transparent #007bff transparent;
+  color: #00ff00;
+  align-items: center;
+}
+h1 {
+  color: #00ff00;
+}
+h2 {
+  color: #00dd00;
+}
+h3 {
+  color: #00aa00;
+}
+h4 {
+  color: #008800;
+}

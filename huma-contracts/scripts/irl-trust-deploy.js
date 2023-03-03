@@ -45,7 +45,7 @@ async function deployContracts(
     0,//uint256 payment,
     ethers.constants.AddressZero//address payable paymentReceiver
   )
-  const fees = [toToken(50), 10, toToken(20), 10, 0]
+  const fees = [toToken(0), 0, toToken(0), 0, 0]
   const principalRateInBps = 0
   const isReceivableContractFlag = false
   // Deploy Pool Starter
@@ -179,7 +179,9 @@ async function deployContracts(
     [lenderA.address],
     maxWithdrawPeriodLength,
     maxWithdrawAmountPerPeriod,
-    endDate
+    endDate,
+    12,
+    30
   );
   await poolContractTwo.initialize(
     poolConfigTwo.address,
@@ -187,7 +189,9 @@ async function deployContracts(
     [lenderA.address, lenderB.address],
     maxWithdrawPeriodLength,
     maxWithdrawAmountPerPeriod,
-    endDate
+    endDate,
+    12,
+    30
   );
   console.log('initialized')
   await poolContractOne.deployed();

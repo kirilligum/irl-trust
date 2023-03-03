@@ -76,11 +76,19 @@ describe("Base Credit Pool", function () {
       const poolBTokensTwo = await token.testTokenContract.balanceOf(poolB.poolContract.address)
       expect(poolBTokensTwo).to.be.equal(depositAmount.add(depositAmount))
 
+      const totalWithdrawnOne = await poolA.poolContract._totalWithdrawn();
+      const drawdownAmount = toToken(1_000)
+      const borrowerBalanceOne = await token.testTokenContract.balanceOf(signers.borrowerA.address)
+      const borrowerADrawdown = await poolA.poolContract.connect(signers.borrowerA).drawdown(drawdownAmount)
+      const borrowerBalanceTwo = await token.testTokenContract.balanceOf(signers.borrowerA.address)
+      const totalWithdrawnTwo = await poolA.poolContract._totalWithdrawn();
+      console.log(borrowerBalanceOne, borrowerBalanceTwo)
+      expect(borrowerBalanceTwo.sub(borrowerBalanceOne)).to.be.equal(drawdownAmount)
+      expect(totalWithdrawnTwo.sub(totalWithdrawnOne)).to.be.equal(drawdownAmount)
+      console.log(totalWithdrawnOne, totalWithdrawnTwo)
 
-      const borrowerADrawdown = await poolA.poolContract.connect(signers.borrowerA).drawdown(toToken(1_000))
-      console.log(borrowerADrawdown)
-
-
+      const allow = await token.testTokenContract.connect(signers.borrowerA).approve(poolA.poolContract.address, drawdownAmount)
+      const repay = await poolA.poolContract.connect(signers.borrowerA).makePayment(drawdownAmount)
     })
   })
 })

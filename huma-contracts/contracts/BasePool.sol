@@ -54,7 +54,9 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
     address[] memory lenders,
     uint256 maxWithdrawPeriodLength,
     uint256 maxWithdrawAmountPerPeriod,
-    uint256 endDate
+    uint256 endDate,
+    uint256 intervalInDays,
+    uint256 aprInBps
   ) external initializer {
     _poolConfig = BasePoolConfig(poolConfigAddr);
     _updateCoreData();
@@ -72,6 +74,9 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
      _maxWithdrawPeriodLength = maxWithdrawPeriodLength;
      _maxWithdrawAmountPerPeriod = maxWithdrawAmountPerPeriod;
      _endDate = endDate;
+     _defaultAprInBps = aprInBps;
+     _defaultIntervalInDays = intervalInDays;
+
   }
 
   //********************************************/

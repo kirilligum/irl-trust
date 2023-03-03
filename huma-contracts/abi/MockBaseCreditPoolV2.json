@@ -346,6 +346,40 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "_creditRecordStaticMapping",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "creditLimit",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint16",
+        "name": "aprInBps",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "intervalInDays",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint96",
+        "name": "defaultAmount",
+        "type": "uint96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "lender",
         "type": "address"
       }

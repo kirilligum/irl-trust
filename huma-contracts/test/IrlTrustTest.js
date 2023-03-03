@@ -77,7 +77,7 @@ describe("Base Credit Pool", function () {
       expect(poolBTokensTwo).to.be.equal(depositAmount.add(depositAmount))
 
 
-      const borrowerADrawdown = await poolA.poolContract.connect(signers.borrowerA).drawdown(toToken(1))
+      const borrowerADrawdown = await poolA.poolContract.connect(signers.borrowerA).drawdown(toToken(1_000))
       console.log(borrowerADrawdown)
 
 

@@ -114,6 +114,17 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   );
 
   /**
+   * @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
+   */
+  function enableCreditPool() external virtual override {
+    _onlyOwnerOrHumaMasterAdminOrPoolStarter();
+
+    BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
+    _setCreditRecord(_approvedBorrower, _approveCredit(cr));
+    enablePool();
+    emit PoolEnabled(msg.sender);
+  }
+  /**
   * @notice Approves the credit request with the terms provided.
   * @param newEndDate new expiration date
   * @param intervalInDays the number of days in each pay cycle

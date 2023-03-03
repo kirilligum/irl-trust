@@ -11,6 +11,7 @@ interface ICredit {
         uint256 aprInBps
     ) external;
 
+    function enableCreditPool() external;
     /// Updating the credit limit of an existing credit line
     function changeCreditLine(uint256 newLine) external;
 

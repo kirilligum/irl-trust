@@ -5,7 +5,7 @@ import {BaseStructs as BS} from "./libraries/BaseStructs.sol";
 
 contract BaseCreditPoolStorage {
     /// mapping from wallet address to the credit record
-    mapping(address => BS.CreditRecord) internal _creditRecordMapping;
+    mapping(address => BS.CreditRecord) public _creditRecordMapping;
     mapping(address => BS.CreditRecordStatic) internal _creditRecordStaticMapping;
     
     /**

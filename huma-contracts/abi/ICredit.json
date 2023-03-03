@@ -54,6 +54,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "enableCreditPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",

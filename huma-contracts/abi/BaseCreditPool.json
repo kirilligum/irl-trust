@@ -625,6 +625,60 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "_creditRecordMapping",
+    "outputs": [
+      {
+        "internalType": "uint96",
+        "name": "unbilledPrincipal",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint64",
+        "name": "dueDate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "int96",
+        "name": "correction",
+        "type": "int96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "totalDue",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint96",
+        "name": "feesAndInterestDue",
+        "type": "uint96"
+      },
+      {
+        "internalType": "uint16",
+        "name": "missedPeriods",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "remainingPeriods",
+        "type": "uint16"
+      },
+      {
+        "internalType": "enum BaseStructs.CreditState",
+        "name": "state",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "lender",
         "type": "address"
       }
@@ -806,6 +860,13 @@
       }
     ],
     "name": "drawdown",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "enableCreditPool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -113,7 +113,7 @@ const Borrow: NextPage = () => {
           </tr>
           <tr>
             <td>0x12af..d78</td>
-            <td>this is your uncle's friend </td>
+            <td>this is a friend of your uncle</td>
             <td>8</td>
             <td>USDC</td>
             <td>%40</td>

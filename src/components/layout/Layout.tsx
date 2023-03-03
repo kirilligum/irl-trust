@@ -1,4 +1,4 @@
-import { Link } from '@chakra-ui/react'
+// import { Link } from '@chakra-ui/react'
 // import { ConnectButton } from '@rainbow-me/rainbowkit'
 // import NextLink from 'next/link'
 import ActiveLink from './ActiveLink'

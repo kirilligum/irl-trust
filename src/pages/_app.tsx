@@ -4,6 +4,7 @@ import type { AppProps } from 'next/app'
 import NextHead from 'next/head'
 import * as React from 'react'
 import { WagmiConfig } from 'wagmi'
+import '../styles/globals.css'
 
 import { chains, client, walletConnectProjectId } from '../wagmi'
 
@@ -15,7 +16,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={client}>
       <NextHead>
-        <title>wagmi</title>
+        <title>IRL-Trust</title>
       </NextHead>
 
       {mounted && <Component {...pageProps} />}

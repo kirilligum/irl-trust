@@ -5,9 +5,6 @@ import { Layout } from '../components/layout/Layout'
 // import XmtpContext from '../context/xmtp'
 // import { tw } from 'twind'
 
-import { useCeramicContext } from '../composedb/context';
-
-
 
 const Borrow: NextPage = () => {
   // const { initClient, client } = useContext(XmtpContext)
@@ -28,40 +25,7 @@ const Borrow: NextPage = () => {
   curr.setDate(curr.getDate() + 3);
   var todayDate = curr.toISOString().substring(0, 10);
 
-  //ceramic stuff
-  const clients = useCeramicContext()
-  const { ceramic, composeClient } = clients
 
-  const createTermsheet = async () => {
-    console.log("writing termsheet....")
-
-    const ts = await composeClient.executeQuery(`
-    mutation {
-      createTermSheet(input:{
-        content:{
-          TermsDescription: "Car financing"
-          AmountUSDC: "1000"
-          LoanPaidOutTo: "xyzCars.eth"
-          LoanStartDate: "2023-03-20"
-          LoanEndDate: "2023-09-20"
-          APR: "6.23"
-          RepaymentStartDate: "2023-04-20"
-          RepaymentEndDate: "2023-12-20"
-          DefaultDays: 90
-          URL: "https://irltrust.xyz/djc8s"
-        }
-      })
-      {
-        document{
-          id
-          TermsDescription
-        }
-      }
-    }
-    `)
-
-    console.log(ts)
-  }
 
   return (
     <Layout>
@@ -74,10 +38,45 @@ const Borrow: NextPage = () => {
         name: <input className='w-64 text-black' name="desc" type="text" defaultValue={"sewing maching "} />
         desc: <input className='w-128 text-black' name="desc" type="text" defaultValue={"sewing maching to start a business"} />
         <h2>Terms</h2>
-        {/* <div className='flex-row'> */}
-        {/*   <button className='triangle-in'>withdraw</button> */}
-        {/*   <div className='triangle-out'>repay</div> */}
-        {/* </div> */}
+        <div className='flex-row gap-1 flex'>
+          <div className='relative'>
+            <div className='triangle-in'>
+            </div>
+            <div className='absolute bottom-2 right-1'>
+              withdraw
+            </div>
+          </div>
+          <div className='relative'>
+            <div className='square'>
+            </div>
+            <div className='absolute bottom-4 '
+              style={{ left: "50%", transform: "translate(-50%,0)" }}
+            >
+              pause
+            </div>
+          </div>
+          <div className='relative'>
+            <div className='triangle-out'>
+            </div>
+            <div className='absolute bottom-2 left-1'>
+              repay
+            </div>
+          </div>
+          {/* <span className='relative'> */}
+          {/*   <button className='square absolute'> */}
+          {/*   </button> */}
+          {/*   <div className=''> */}
+          {/*     wait */}
+          {/*   </div> */}
+          {/* </span> */}
+          {/* <span className='relative flex-col'> */}
+          {/*   <button className='triangle-out absolute'> */}
+          {/*   </button> */}
+          {/*   <div className=''> */}
+          {/*     repay */}
+          {/*   </div> */}
+          {/* </span> */}
+        </div>
         <h3>Growth: withdrawls</h3>
         <h4>linear:</h4>
         <div className='flex-row'>
@@ -124,10 +123,7 @@ const Borrow: NextPage = () => {
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
         </div>
         <p>90 days to default</p>
-
-        <button onClick={() => { createTermsheet() }}
-
-          className='p-2 bg-orange-600'>send to lenders</button>
+        <button className='p-2 bg-orange-600'>send to lenders</button>
         <div>URL: irl-trust.xyz/alsdkfja
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>

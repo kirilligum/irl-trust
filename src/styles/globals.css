@@ -3,23 +3,22 @@
 @tailwind utilities;
 
 .triangle-out {
-  width: 0;
-  height: 0;
   border-style: solid;
-  border-width: 10px 0 0 10px;
+  border-width: 100px 0 0 150px;
   border-color: transparent transparent transparent #007bff;
   color: #00ff00;
-  align-items: center;
-  justify-items: center;
+}
+.square{
+  border-style: solid;
+  border-width: 50px 50px 50px 50px;
+  border-color: #007bff;
+  color: #00ff00;
 }
 .triangle-in {
-  width: 0;
-  height: 0;
   border-style: solid;
-  border-width: 0 0 10px 10px;
+  border-width: 0 0 100px 100px;
   border-color: transparent transparent #007bff transparent;
   color: #00ff00;
-  align-items: center;
 }
 h1 {
   color: #00ff00;

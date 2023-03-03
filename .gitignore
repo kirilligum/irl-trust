@@ -1,5 +1,6 @@
 # Environment variables
 .env
+.next
 
 # Hardhat files
 cache

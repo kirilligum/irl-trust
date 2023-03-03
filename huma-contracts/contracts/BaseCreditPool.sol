@@ -114,6 +114,21 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   );
 
   /**
+   * @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
+   */
+  function enableCreditPool() external virtual override {
+    _onlyOwnerOrHumaMasterAdminOrPoolStarter();
+
+    BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
+    BS.CreditRecordStatic storage crs = _creditRecordStaticMapping[_approvedBorrower];
+    _setCreditRecord(_approvedBorrower, _approveCredit(cr));
+
+    uint256 periods = (_endDate - _startDate) / _maxWithdrawPeriodLength;
+    crs.creditLimit = uint96(periods * _maxWithdrawAmountPerPeriod);
+    enablePool();
+    emit PoolEnabled(msg.sender);
+  }
+  /**
   * @notice Approves the credit request with the terms provided.
   * @param newEndDate new expiration date
   * @param intervalInDays the number of days in each pay cycle
@@ -428,7 +443,7 @@ return losses;
         // before the first drawdown, thus the cr.dueDate > 0 condition in the check
         if (cr.dueDate > 0 && block.timestamp > cr.dueDate)
           revert Errors.creditExpiredDueToFirstDrawdownTooLate();
-
+        console.log('creditLimit', _creditRecordStaticMapping[_approvedBorrower].creditLimit);
         if (borrowAmount > _creditRecordStaticMapping[_approvedBorrower].creditLimit)
           revert Errors.creditLineExceeded();
 
@@ -442,7 +457,9 @@ return losses;
       if (block.timestamp > _endDate) {
         uint256 elapsedSeconds = block.timestamp - _startDate;
         uint256 periodsElapsed = elapsedSeconds / _maxWithdrawPeriodLength;
-        if (_totalWithdrawn+borrowAmount > periodsElapsed * _maxWithdrawAmountPerPeriod) {
+        console.log(_totalWithdrawn+borrowAmount);
+        console.log(periodsElapsed * _maxWithdrawAmountPerPeriod);
+        if (_totalWithdrawn+borrowAmount > (periodsElapsed + 1) * _maxWithdrawAmountPerPeriod) {
           revert Errors.creditInPeriodExceeded();
         }
       }

@@ -50,7 +50,7 @@ describe("Base Credit Pool", function () {
       expect(borrowerInPoolA).to.be.equal(signers.borrowerA.address)
       const borrowerInPoolB = await poolB.poolContract._approvedBorrower()
       expect(borrowerInPoolB).to.be.equal(signers.borrowerB.address)
-
+      
       const isLenderAinPoolA = await poolA.poolContract._approvedLenders(signers.lenderA.address)
       expect(isLenderAinPoolA).to.be.true;
       const isLenderBinPoolA = await poolA.poolContract._approvedLenders(signers.lenderB.address)
@@ -68,7 +68,6 @@ describe("Base Credit Pool", function () {
       await token.testTokenContract.connect(signers.lenderA).approve(poolA.poolContract.address, depositAmount);
       await token.testTokenContract.connect(signers.lenderA).approve(poolB.poolContract.address, depositAmount);
       await token.testTokenContract.connect(signers.lenderB).approve(poolB.poolContract.address, depositAmount);
-      console.log('approvals complete')
       await poolA.poolContract.connect(signers.lenderA).deposit(depositAmount);
       await poolB.poolContract.connect(signers.lenderA).deposit(depositAmount);
       await poolB.poolContract.connect(signers.lenderB).deposit(depositAmount);
@@ -76,8 +75,10 @@ describe("Base Credit Pool", function () {
       expect(poolATokensTwo).to.be.equal(depositAmount)
       const poolBTokensTwo = await token.testTokenContract.balanceOf(poolB.poolContract.address)
       expect(poolBTokensTwo).to.be.equal(depositAmount.add(depositAmount))
-      
 
+
+      const borrowerADrawdown = await poolA.poolContract.connect(signers.borrowerA).drawdown(toToken(1_000))
+      console.log(borrowerADrawdown)
 
 
     })

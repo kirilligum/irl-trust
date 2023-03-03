@@ -45,7 +45,7 @@ async function deployContracts(
     0,//uint256 payment,
     ethers.constants.AddressZero//address payable paymentReceiver
   )
-  const fees = [toToken(1000), 100, toToken(2000), 100, 0]
+  const fees = [toToken(50), 10, toToken(20), 10, 0]
   const principalRateInBps = 0
   const isReceivableContractFlag = false
   // Deploy Pool Starter

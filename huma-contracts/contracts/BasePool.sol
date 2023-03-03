@@ -218,7 +218,7 @@ abstract contract BasePool is Initializable, BasePoolStorage, ILiquidityProvider
   /**
    * @notice turns on the pool. Only the pool owner or protocol owner can enable a pool.
    */
-  function enablePool() external virtual override {
+  function enablePool() public  virtual override {
     _onlyOwnerOrHumaMasterAdminOrPoolStarter();
 
     _poolConfig.checkLiquidityRequirement();

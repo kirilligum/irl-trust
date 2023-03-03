@@ -59,5 +59,8 @@ contract BasePoolStorage {
     uint256 _maxWithdrawAmountPerPeriod;
     uint256 _endDate;
     uint256 _startDate;
-    uint256 _totalWithdrawn;
+    uint256 public _totalWithdrawn;
+    uint256 _defaultAprInBps;
+    uint256 _defaultIntervalInDays;
+
 }

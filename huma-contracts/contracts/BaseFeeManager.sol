@@ -113,6 +113,7 @@ contract BaseFeeManager is IFeeManager, Ownable {
     ) external view virtual override returns (uint256 correction) {
         // rounding to days
         uint256 remainingTime = dueDate - block.timestamp;
+        console.log(amount, aprInBps, remainingTime);
 
         return (amount * aprInBps * remainingTime) / SECONDS_IN_A_YEAR / HUNDRED_PERCENT_IN_BPS;
     }
@@ -167,10 +168,12 @@ contract BaseFeeManager is IFeeManager, Ownable {
     {
         // Calculate platform fee, which includes protocol fee and pool fee
         platformFees = calcFrontLoadingFee(borrowAmount);
+        console.log('platform fees', platformFees);
 
         if (borrowAmount < platformFees) revert Errors.borrowingAmountLessThanPlatformFees();
 
         amtToBorrower = borrowAmount - platformFees;
+        console.log('amtToBorrower', amtToBorrower);
 
         return (amtToBorrower, platformFees);
     }
@@ -221,10 +224,13 @@ contract BaseFeeManager is IFeeManager, Ownable {
         // Computes how many billing periods have passed. 1+ is needed since Solidity always
         // round to zero. When it is exactly at a billing cycle, it is desirable to 1+ as well
         if (_cr.dueDate > 0) {
+          console.log('2.75');
+          console.log('intervalInDays', _crStatic.intervalInDays);
             periodsPassed =
                 1 +
                 (block.timestamp - _cr.dueDate) /
                 (_crStatic.intervalInDays * SECONDS_IN_A_DAY);
+            console.log('2.76');
             // No credit line has more than 360 periods. If it is longer than that, something
             // is wrong. Set it to 361 so that the non view function can emit an event.
             assert(periodsPassed <= MAX_PERIODS);

@@ -120,11 +120,15 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
     _onlyOwnerOrHumaMasterAdminOrPoolStarter();
 
     BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
-    BS.CreditRecordStatic storage crs = _creditRecordStaticMapping[_approvedBorrower];
+    uint256 periods = (_endDate - _startDate) / _maxWithdrawPeriodLength;
+    _creditRecordStaticMapping[_approvedBorrower] = BS.CreditRecordStatic({
+    creditLimit:  uint96(periods * _maxWithdrawAmountPerPeriod),
+      aprInBps: uint16(_defaultAprInBps),
+      intervalInDays: uint16(_defaultIntervalInDays),
+      defaultAmount: uint96(0)
+    });
     _setCreditRecord(_approvedBorrower, _approveCredit(cr));
 
-    uint256 periods = (_endDate - _startDate) / _maxWithdrawPeriodLength;
-    crs.creditLimit = uint96(periods * _maxWithdrawAmountPerPeriod);
     enablePool();
     emit PoolEnabled(msg.sender);
   }
@@ -210,6 +214,8 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
   * @param borrowAmount the amount to borrow
    */
   function drawdown(uint256 borrowAmount) external virtual override {
+    console.log('drawing down');
+    console.log('borrowAmount', borrowAmount);
     address borrower = msg.sender;
     // Open access to the borrower
     if (borrowAmount == 0) revert Errors.zeroAmountProvided();
@@ -473,6 +479,7 @@ return losses;
       BS.CreditRecord memory cr,
       uint256 borrowAmount
     ) internal virtual returns (uint256) {
+      console.log('borrowAmount', borrowAmount);
       if (cr.state == BS.CreditState.Approved) {
         // Flow for first drawdown
         // Update total principal
@@ -516,8 +523,8 @@ return losses;
               cr.dueDate,
               _creditRecordStaticMapping[_approvedBorrower].aprInBps,
               borrowAmount
-        )
-        )
+            )
+          )
         );
 
         cr.unbilledPrincipal = uint96(cr.unbilledPrincipal + borrowAmount);
@@ -532,6 +539,9 @@ return losses;
       if (platformFees > 0) distributeIncome(platformFees);
 
       // Transfer funds to the _borrower
+
+      console.log('borrowAmount', borrowAmount);
+      console.log('newAmountToBorrow', netAmountToBorrower);
       _underlyingToken.safeTransfer(_approvedBorrower, netAmountToBorrower);
       _totalWithdrawn += borrowAmount;
       return netAmountToBorrower;
@@ -641,9 +651,10 @@ return losses;
       _protocolAndPoolOn();
 
       if (amount == 0) revert Errors.zeroAmountProvided();
-
+      console.log('1');
       BS.CreditRecord memory cr = _getCreditRecord(_approvedBorrower);
 
+      console.log('2');
       if (
         cr.state == BS.CreditState.Requested ||
           cr.state == BS.CreditState.Approved ||
@@ -658,6 +669,7 @@ return losses;
       if (block.timestamp > cr.dueDate) {
         // Bring the account current. This is necessary since the account might have been dormant for
         // several cycles.
+        console.log('2.5');
         cr = _updateDueInfo(false, true);
       }
 
@@ -669,6 +681,7 @@ return losses;
         cr.unbilledPrincipal + cr.totalDue - cr.feesAndInterestDue
       );
 
+      console.log('3');
       uint256 payoffAmount = uint256(
         int256(int96(cr.totalDue + cr.unbilledPrincipal)) + int256(cr.correction)
       ) - payoffCorrection;
@@ -685,7 +698,7 @@ return losses;
           ) return (0, false, true);
         }
       }
-
+      console.log('4');
       // The amount to be collected from the borrower. When _amount is more than what is needed
       // for payoff, only the payoff amount will be transferred
       uint256 amountToCollect;
@@ -719,6 +732,7 @@ return losses;
           if (cr.state == BS.CreditState.Delayed) cr.state = BS.CreditState.GoodStanding;
         }
 
+      console.log('5');
         // Gets the correction.
         if (principalPayment > 0) {
           // If there is principal payment, calculate new correction

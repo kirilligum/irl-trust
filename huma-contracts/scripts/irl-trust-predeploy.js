@@ -154,7 +154,8 @@ async function deployContracts(
       pdsServiceAccount: pdsServiceAccount.address,
       evaluationAgent: evaluationAgent.address,
       proxyOwner: proxyOwner.address
-    }
+    },
+    eaNFTTokenId: eaNFTTokenId
   }))
 }
 

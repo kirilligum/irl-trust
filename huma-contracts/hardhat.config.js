@@ -130,6 +130,7 @@ module.exports = {
 
     networks: {
         hardhat: {
+          chainId: 1337,
           accounts: {
             mnemonic: process.env.MNEMONIC
           }

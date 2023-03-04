@@ -6,7 +6,6 @@ import { Layout } from '../components/layout/Layout'
 // import { tw } from 'twind'
 import {
   useProposal,
-  usePoolFactory
 } from '../hooks/usePool'
 const Borrow: NextPage = () => {
   const {
@@ -19,6 +18,7 @@ const Borrow: NextPage = () => {
     aprInBps, setAprInBps,
     submitTerms,
     getTerms,
+    createPool,
   } = useProposal()
   const [lendersIter, setLendersIter] = useState(1)
   // const { initClient, client } = useContext(XmtpContext)
@@ -172,7 +172,10 @@ const Borrow: NextPage = () => {
                     old[i] = event.target.value
                     return old
                   } )}}
-                    key={i} style={{marginBottom: '1px'}} className='w-64 text-black' type="text" value={lenders[i]} /><br/></>)
+                    key={i} style={{
+                      marginBottom: '1px',
+                      width: '390px'
+                    }} className='text-black' type="text" value={lenders[i]} /><br/></>)
             })
           }
           <button
@@ -187,7 +190,10 @@ const Borrow: NextPage = () => {
             className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+</button>
         </div>
         <div className='flex-row'>
-          end date: <input className='w-32 text-black' type="date" value={todayDate} />
+          end date:<br/>
+          <input
+            onChange={(event) => setEndDate(new Date(event.target.value))}
+          className='w-32 text-black' type="date" value={endDate.toISOString().split('T')[0]} />
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
@@ -195,7 +201,12 @@ const Borrow: NextPage = () => {
         </div>
         <h3>Caring: repayments</h3>
         <div className='flex-row'>
-          APR: <input className='w-32 text-black' type="float" value={15} />% +
+          APR:<br/>
+          <input
+            onChange={(event) => {
+              setAprInBps(Number(event.target.value))
+            }}
+          className='w-32 text-black' type="float" value={aprInBps} />% +
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.01</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.10</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button>
@@ -215,7 +226,11 @@ const Borrow: NextPage = () => {
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
         </div>
         <p>90 days to default</p>
-        <button className='p-2 bg-orange-600'>send to lenders</button>
+        <button
+          onClick={async () => {
+            await createPool()
+          }}
+        className='p-2 bg-orange-600'>Initialize Pool</button>
         <div>URL: irl-trust.xyz/alsdkfja
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>

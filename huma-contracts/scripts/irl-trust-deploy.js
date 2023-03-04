@@ -240,6 +240,7 @@ async function deployContracts(
   await poolConfigTwo.connect(poolOwner).setPoolOwnerTreasury(poolOwnerTreasury.address);
   await poolConfigTwo.connect(poolOwner).addPoolOperator(poolOwner.address);
   await poolConfigTwo.connect(poolOwner).addPoolOperator(poolOperator.address);
+  /*
   console.log('pool operators, treasury owners and owners configured')
   await poolContractOne.connect(poolOperator).addApprovedLender(poolOwnerTreasury.address);
   await poolContractOne.connect(poolOperator).addApprovedLender(evaluationAgent.address);
@@ -249,6 +250,7 @@ async function deployContracts(
   await poolContractTwo.connect(poolOperator).addApprovedLender(evaluationAgent.address);
   await poolContractTwo.connect(poolOperator).addApprovedLender(lenderA.address);
   await poolContractTwo.connect(poolOperator).addApprovedLender(lenderB.address);
+  */
   console.log('lenders configured')
   await testTokenContract
     .connect(poolOwnerTreasury)

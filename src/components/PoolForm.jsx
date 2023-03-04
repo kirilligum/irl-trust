@@ -15,9 +15,9 @@ export const PoolForm = ({handlePoolContract}) => {
     lenders, setLenders,
     intervalInDays, setIntervalInDays,
     aprInBps, setAprInBps,
-    submitTerms,
     getTerms,
     createPool,
+    submitTerms,
     poolContract
   } = useProposal()
   const [lendersIter, setLendersIter] = useState(1)
@@ -223,6 +223,7 @@ export const PoolForm = ({handlePoolContract}) => {
       <p>90 days to default</p>
       <button
         onClick={async () => {
+          await submitTerms()
           await createPool()
         }}
         className='p-2 bg-orange-600'>Initialize Pool</button>

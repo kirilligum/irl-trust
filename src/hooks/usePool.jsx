@@ -17,6 +17,7 @@ const mapPeriod = (item) => {
       return 3600 * 24 * 365
   }
 }
+
 export const useProposal = () => {
   //for ceramic
   const clients = useCeramicContext()
@@ -41,10 +42,8 @@ export const useProposal = () => {
   const [aprInBps, setAprInBps]  = useState(30)
   const [poolContract,setPoolContract] = useState(null)
   const { data:signer, isError, isLoading } = useSigner()
-  const submitTerms = useCallback(() => {
   const [repaymentStartDate, setRepaymentStartDate] = useState(new Date())
   const [repaymentEndDate, setRepaymentEndDate] = useState(new Date())
-
   const submitTerms = useCallback(async () => {
     let queryString = `
     mutation {
@@ -71,10 +70,7 @@ export const useProposal = () => {
       }
     }
     `
-
     console.log("querystring: ", queryString)
-
-
 
     const ts = await composeClient.executeQuery(queryString)
     console.log("ts: ", ts)
@@ -230,7 +226,6 @@ export const useProposal = () => {
       setBorrower(address)
     }
   }, [isConnected])
-
   return {
     name:name,
     setName:setName,
@@ -254,8 +249,7 @@ export const useProposal = () => {
     setRepaymentEndDate: setRepaymentEndDate,
     loanPaidTo: loanPaidTo,
     setLoanPaidTo: setLoanPaidTo,
-    description: desciption,
+    description: description,
     setDescription: setDescription
   }
 }
-

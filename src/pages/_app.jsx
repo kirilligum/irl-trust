@@ -1,6 +1,5 @@
 import { EthereumClient } from '@web3modal/ethereum'
 import { Web3Modal } from '@web3modal/react'
-import type { AppProps } from 'next/app'
 import NextHead from 'next/head'
 import * as React from 'react'
 import { WagmiConfig } from 'wagmi'
@@ -15,7 +14,7 @@ import { authenticateCeramic } from '../composedb/utils'
 
 const ethereumClient = new EthereumClient(client, chains)
 
-function App({ Component, pageProps }: AppProps) {
+function App({ Component, pageProps }) {
 
   //ceramic stuff
   const clients = useCeramicContext()

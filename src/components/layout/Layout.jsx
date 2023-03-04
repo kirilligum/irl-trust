@@ -11,14 +11,7 @@ import { useAccount } from 'wagmi'
 // import { CheckBadgeIcon, CheckCircleIcon, HomeIcon, InboxIcon, PaperAirplaneIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
 
 
-interface LayoutProps {
-  children: React.ReactNode
-  customMeta?: MetaProps
-}
-
-
-
-export const Layout = ({ children, customMeta }: LayoutProps): JSX.Element => {
+export const Layout = ({ children, customMeta }) => {
   const { address } = useAccount()
   const { isConnected } = useAccount()
   // const connectedOwnsNFT = useCheckOwnership(address)

@@ -7,6 +7,10 @@ import { Layout } from '../components/layout/Layout'
 import {
   useProposal,
 } from '../hooks/usePool'
+
+
+
+
 const Borrow = () => {
   const {
     name, setName,
@@ -104,12 +108,12 @@ const Borrow = () => {
         <h3>Growth: withdrawls</h3>
         <h4>linear:</h4>
         <div className='flex-row'>
-          amount per period(USDC):<br/>
+          amount per period(USDC):<br />
           <input
             onChange={(event) => {
               setMaxWithdrawPerPeriod(Number(event.target.value))
             }}
-            className='w-32 text-black' type="float" value={maxWithdrawPerPeriod} />
+            className='w-32 text-black' type="float" defaultValue={maxWithdrawPerPeriod} />
           <button
             onClick={() => {
               setMaxWithdrawPerPeriod(
@@ -137,11 +141,11 @@ const Borrow = () => {
                 old => old + 1000
               )
             }}
-            className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+1000</button><br/>
+            className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+1000</button><br />
           <div className='flex-row'>
-            Period Length: <br/>
+            Period Length: <br />
             <input
-              className='w-32 text-black' type="text" value={withdrawPeriodLength} />
+              className='w-32 text-black' type="text" defaultValue={withdrawPeriodLength} />
             <button
               onClick={() => {
                 setWithdrawPeriodLength('day')
@@ -163,19 +167,21 @@ const Borrow = () => {
               }}
               className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
           </div>
-          Authorized Lenders:<br/>
+          Authorized Lenders:<br />
           {
             [...Array(lendersIter).keys()].map((i) => {
               return (<>
                 <input
-                  onChange={(event) => {setLenders(old => {
-                    old[i] = event.target.value
-                    return old
-                  } )}}
-                    key={i} style={{
-                      marginBottom: '1px',
-                      width: '390px'
-                    }} className='text-black' type="text" value={lenders[i]} /><br/></>)
+                  onChange={(event) => {
+                    setLenders(old => {
+                      old[i] = event.target.value
+                      return old
+                    })
+                  }}
+                  key={i} style={{
+                    marginBottom: '1px',
+                    width: '390px'
+                  }} className='text-black' type="text" value={lenders[i]} /><br /></>)
             })
           }
           <button
@@ -190,10 +196,10 @@ const Borrow = () => {
             className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+</button>
         </div>
         <div className='flex-row'>
-          end date:<br/>
+          end date:<br />
           <input
             onChange={(event) => setEndDate(new Date(event.target.value))}
-          className='w-32 text-black' type="date" value={endDate.toISOString().split('T')[0]} />
+            className='w-32 text-black' type="date" defaultValue={endDate.toISOString().split('T')[0]} />
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
@@ -201,25 +207,25 @@ const Borrow = () => {
         </div>
         <h3>Caring: repayments</h3>
         <div className='flex-row'>
-          APR:<br/>
+          APR:<br />
           <input
             onChange={(event) => {
               setAprInBps(Number(event.target.value))
             }}
-          className='w-32 text-black' type="float" value={aprInBps} />% +
+            className='w-32 text-black' type="float" defaultValue={aprInBps} />% +
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.01</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.10</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button>
         </div>
         <div className='flex-row'>
-          start date: <input className='w-32 text-black' type="date" value={todayDate} /> +
+          start date: <input className='w-32 text-black' type="date" defaultValue={todayDate} /> +
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
         </div>
         <div className='flex-row'>
-          end date: <input className='w-32 text-black' type="date" value={todayDate} />+
+          end date: <input className='w-32 text-black' type="date" defaultValue={todayDate} />+
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
@@ -228,9 +234,10 @@ const Borrow = () => {
         <p>90 days to default</p>
         <button
           onClick={async () => {
-            await createPool()
+            // await createPool()
+            submitTerms()
           }}
-        className='p-2 bg-orange-600'>Initialize Pool</button>
+          className='p-2 bg-orange-600'>Initialize Pool</button>
         <div>URL: irl-trust.xyz/alsdkfja
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>

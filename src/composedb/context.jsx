@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import { CeramicClient } from "@ceramicnetwork/http-client"
 import { ComposeClient } from "@composedb/client";
 
-import { definition } from "./definition.js";
+import { definition } from "./runtime-composite.js";
 
 /**
  * Configure ceramic Client & create context.
@@ -15,7 +15,7 @@ const composeClient = new ComposeClient({
   definition: definition,
 });
 
-const CeramicContext = createContext({ ceramic: ceramic, composeClient: composeClient });
+const CeramicContext = createContext({ ceramic, composeClient });
 
 export const CeramicWrapper = ({ children }) => {
   return (

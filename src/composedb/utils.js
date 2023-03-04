@@ -1,21 +1,21 @@
 import { DIDSession } from "did-session";
 import { EthereumWebAuth, getAccountId } from "@didtools/pkh-ethereum";
-import type { CeramicApi } from "@ceramicnetwork/common"
-import type { ComposeClient } from "@composedb/client";
+// import type { CeramicApi } from "@ceramicnetwork/common"
+// import type { ComposeClient } from "@composedb/client";
 
 
-// If you are relying on an injected provider this must be here otherwise you will have a type error. 
-declare global {
-    interface Window {
-        ethereum: any;
-    }
-}
+// // If you are relying on an injected provider this must be here otherwise you will have a type error. 
+// declare global {
+//     interface Window {
+//         ethereum: any;
+//     }
+// }
 
 /**
  * Checks localStorage for a stored DID Session. If one is found we authenticate it, otherwise we create a new one.
  * @returns Promise<DID-Session> - The User's authenticated sesion.
  */
-export const authenticateCeramic = async (ceramic: CeramicApi, compose: ComposeClient) => {
+export const authenticateCeramic = async (ceramic, compose) => {
     const sessionStr = localStorage.getItem('did') // for production you will want a better place than localStorage for your sessions.
     console.log("sessionStr from localStorage: ", sessionStr)
     let session

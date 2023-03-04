@@ -3,6 +3,7 @@ const {expect} = require("chai");
 const {BigNumber: BN} = require("ethers");
 const {hasRestParameter} = require("typescript");
 const { getSafeTemplate } = require('./gnosis-safe-mock.js')
+const fs = require('fs')
 function toBN(number, decimals) {
 
   return BN.from(number).mul(BN.from(10).pow(BN.from(decimals)));
@@ -54,6 +55,7 @@ async function deployContracts(
   // Deploy EvaluationAgentNFT
   const EvaluationAgentNFT = await ethers.getContractFactory("EvaluationAgentNFT");
   eaNFTContract = await EvaluationAgentNFT.deploy();
+  console.log('Aprs and max credit lines')
 
   // Deploy HumaConfig
   const HumaConfig = await ethers.getContractFactory("HumaConfig");
@@ -284,8 +286,56 @@ async function deployContracts(
   await poolConfigOne.connect(poolOwner).setMaxCreditLine(toToken(10_000_000));
   await poolConfigTwo.connect(poolOwner).setAPR(1217);
   await poolConfigTwo.connect(poolOwner).setMaxCreditLine(toToken(10_000_000));
-  console.log('Aprs and max credit lines')
-
+  fs.writeFileSync('../src/public/Static.json', JSON.stringify({
+    poolOne: {
+      addressImpl: poolImplOne.address,
+      addressProxy: poolProxyOne.address,
+      abi: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').abi
+    },
+    poolTwo: {
+      addressImpl: poolImplOne.address,
+      addressProxy: poolProxyTwo.address,
+      abi: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').abi
+    },
+    poolConfigOne: {
+      address: poolConfigOne.address,
+      abi: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').abi
+    },
+    poolConfigTwo: {
+      address: poolConfigTwo.address,
+      abi: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').abi
+    },
+    hDTOne: {
+      addressImpl: hdtImplOne.address,
+      addressProxy: hdtProxyOne.address,
+      abi: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').abi
+    },
+    hDTTwo: {
+      addressImpl: hdtImplTwo.address,
+      addressProxy: hdtProxyTwo.address,
+      abi: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').abi
+    },
+    testToken: {
+      address: testTokenContract.address,
+      abi: require('../artifacts/contracts/mock/TestToken.sol/TestToken.json').abi
+    },
+    poolStarter: {
+      address: poolStarter.address,
+      abi: require('../artifacts/contracts/PoolStarter.sol/PoolStarter.json').abi
+    },
+    eaNFTContract: {
+      address: eaNFTContract.address,
+      abi: require('../artifacts/contracts/EvaluationAgentNFT.sol/EvaluationAgentNFT.json').abi
+    },
+    humaConfig: {
+      address: humaConfigContract.address,
+      abi: require('../artifacts/contracts/HumaConfig.sol/HumaConfig.json').abi
+    },
+    BaseFeeManager: {
+      address: feeManagerContract.address,
+      abi: require('../artifacts/contracts/BaseFeeManager.sol/BaseFeeManager.json').abi
+    }
+  }))
   return {
     starter: {poolStarter},
     poolA: {hdtContractOne, poolConfigOne, poolContract:poolContractOne, poolImplOne, poolProxyOne},

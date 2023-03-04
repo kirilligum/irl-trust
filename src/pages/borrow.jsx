@@ -15,6 +15,12 @@ import {
 const Borrow = () => {
   const [lendersIter, setLendersIter] = useState(1)
   const [pool, setPool] = useState(null)
+  const [lenders, setLenders] = useState([])
+  useEffect(() => {
+    if (pool) {
+        
+    }
+  }, [pool])
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 
@@ -27,7 +33,7 @@ const Borrow = () => {
   //   if (client) {
   //     setXMTPConnected(true)
   //   }
-  // }, [client])
+  // }, [client]
 
   var curr = new Date();
   curr.setDate(curr.getDate() + 3);
@@ -38,12 +44,25 @@ const Borrow = () => {
     setPool(pc)
   }
 
+  const lendersList = lenders.map((lender, i) => {
+    return (
+      <tr key={i}>
+        <td>lender.address</td>
+        <td>lender.message</td>
+        <td>lender.deposited</td>
+        <td>USDC</td>
+        <td>%60</td>
+        <td>lender.approved</td>
+      </tr>
+    )
+  })
+
   return (
     <Layout>
       <PoolForm
         handlePoolContract={handlePoolContract}
       />
-        {pool && (<><div>URL: irl-trust.xyz/{poolContract.address}
+        {pool && (<><div>URL: irl-trust.xyz/{pool.address}
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>
 
@@ -57,24 +76,14 @@ const Borrow = () => {
             <td>pool %</td>
             <td>approval</td>
           </tr>
-          <tr>
-            <td>0xbe23..f34</td>
-            <td>this is your uncle, happy to help with starting your sewing business</td>
-            <td>12</td>
-            <td>USDC</td>
-            <td>%60</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>approve</button></td>
-          </tr>
-          <tr>
-            <td>0x12af..d78</td>
-            <td>this is a friend of your uncle</td>
-            <td>8</td>
-            <td>USDC</td>
-            <td>%40</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>approve</button></td>
-          </tr>
+          { lendersList() }
         </table>
         total approvals: 0, total amount commited: 0
+        <button
+          onClick={async () => {
+            await enablePool()
+          }}
+          className='p-2 bg-orange-600'>Initialize Pool</button>
         <h1>withdrawls</h1>
         <table>
           <tr>

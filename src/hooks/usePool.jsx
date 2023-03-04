@@ -203,7 +203,7 @@ export const useProposal = () => {
       await poolConfig.setWithdrawalLockoutPeriod(90)
       await poolConfig.setPoolDefaultGracePeriod(60)
     }
-  }, [])
+  }, [endDate, maxWithdrawPerPeriod, withdrawPeriodLength])
 
   const createPool = useCallback(async (
   ) => {
@@ -220,6 +220,12 @@ export const useProposal = () => {
     setPoolContract(pool)
     
   }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
+
+  const enablePool = useCallback(() => {
+    if (!isError && !isLoading) {
+
+    }
+  }, [poolContract])
 
   useEffect(() => {
     if (isConnected) {
@@ -252,4 +258,38 @@ export const useProposal = () => {
     description: description,
     setDescription: setDescription
   }
+}
+
+export const usePool = () => {
+  const { address, isConnected } = useAccount()
+  const { data:signer, isError, isLoading } = useSigner()
+  const [approved, setApproved] = useState(false)
+  const poolContract = useContract({
+    address: Static.poolA.address,
+    abi: Static.poolA.abi
+  })
+
+  const depositInPool = useCallback(async(amount) => {
+    if (!isError && !isLoading) {
+    }
+  }, [])
+
+  const isApprovedLender = useCallback(async() => {
+    if (!isError && !isLoading) {
+      const isApprovedLender = await poolContract.isApprovedLender(
+        address
+      )
+      setApproved(isApprovedLender)
+    }
+
+  }, [isError, isLoading])
+
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      isApprovedLender()
+    }
+
+  }, [isLoading, isError])
+
+  return { isApproved }
 }

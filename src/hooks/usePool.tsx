@@ -2,6 +2,19 @@ import { useState, useCallback, useEffect } from 'react'
 import {ethers} from 'ethers'
 import { useAccount, useContract, useSigner } from 'wagmi'
 import Static from '../public/Static.json'
+
+const mapPeriod = (item) => {
+  switch(item) {
+    case 'day':
+      return 3600*24
+    case 'week':
+      return 3600*24*7
+    case 'month':
+      return 3600*24*30 
+    case 'year':
+      return 3600*24*365
+  }
+}
 export const useProposal = () => {
   const {address, isConnected} = useAccount()
   const [borrower, setBorrower] = useState("")
@@ -19,6 +32,8 @@ export const useProposal = () => {
   const [liquidityCap, setLiquidityCap] = useState(
     ethers.utils.parseUnits('1000000', 'ether')
   )
+  const [pool,setPool] = useState({})
+  const { data:signer, isError, isLoading } = useSigner()
   const submitTerms = useCallback(() => {
 
   },[])
@@ -26,53 +41,24 @@ export const useProposal = () => {
   const getTerms = useCallback(() => {
   }, [])
 
-  useEffect(() => {
-    if (isConnected) {
-      setBorrower(address)
-    }
-  }, [isConnected])
-
-  return {
-    name, setName,
-    withdrawPeriodLength, setWithdrawPeriodLength,
-    maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
-    endDate, setEndDate,
-    lenders, setLenders,
-    intervalInDays, setIntervalInDays,
-    aprInBps, setAprInBps,
-    submitTerms,
-    getTerms,
-  }
-}
-
-export const usePoolFactory = () => {
-  const [pool,setPool] = useState({})
-  const { address, isConnected } = useAccount()
-  const { data:signer, isError, isLoading } = useSigner()
-  const {
-    name,
-    lenders,
-    maxWithdrawPerPeriod,
-    withdrawPeriodLength,
-    endDate,
-    intervalInDays,
-    aprInBps
-  } = useProposal()
-
   const deployHDT = useCallback(async () => {
     if (!isError && !isLoading) {
+      console.log('tup')
       const TUP = new ethers.ContractFactory(
         new ethers.utils.Interface(Static.TransparentUpgradeableProxy.abi),
         Static.TransparentUpgradeableProxy.bytecode,
         signer
       )
+      console.log('hdt')
       const HDT = new ethers.ContractFactory(
         new ethers.utils.Interface(Static.HDT.abi),
         Static.HDT.bytecode,
         signer
       )
+      console.log('hdtimpl deploy')
       const hdtImpl = await HDT.deploy()
       await hdtImpl.deployed()
+      console.log('hdtproxy (tup) deploy')
       const hdtProxy = await TUP.deploy(
         hdtImpl.address,
         Static.addresses.proxyOwner,
@@ -98,7 +84,6 @@ export const usePoolFactory = () => {
       )
       const poolConfig = await PoolConfig.deploy();
       await poolConfig.deployed()
-      setPoolConfigAddr(poolConfig.addr)
       await poolConfig.initialize(
         name,
         hdtAddr,
@@ -111,7 +96,7 @@ export const usePoolFactory = () => {
   }, [])
 
   const deployPool = useCallback(async (poolConfigAddr) => {
-    if (!isError && !isLoading && hdtAddr && poolConfigAddr) {
+    if (!isError && !isLoading && poolConfigAddr) {
       const TUP = new ethers.ContractFactory(
         new ethers.utils.Interface(Static.TransparentUpgradeableProxy.abi),
         Static.TransparentUpgradeableProxy.bytecode,
@@ -138,8 +123,9 @@ export const usePoolFactory = () => {
         poolConfigAddr,
         address,
         lenders,
-        withdrawPeriodLength,
-        maxWithdrawPerPeriod,
+        mapPeriod(withdrawPeriodLength),
+        ethers.utils.parseUnits(String(maxWithdrawPerPeriod), 'ether'),
+        Math.floor(endDate.getTime() / 1000),
         intervalInDays,
         aprInBps
       )
@@ -153,17 +139,22 @@ export const usePoolFactory = () => {
     if (!isError && !isLoading) {
       await poolConfig.setPool(pool.address)
       await hdt.setPool(pool.address)
+      console.log('liquidity cap')
       await poolConfig.setPoolLiquidityCap(
         ethers.utils.parseUnits(`${
           (
-            (endDate - Math.floor(new Date().getTime() / 1000)) /
-            withdrawPeriodLength
+            (Math.floor(endDate.getTime() / 1000) - 
+             Math.floor(new Date().getTime() / 1000)) /
+            mapPeriod(withdrawPeriodLength)
           ) * maxWithdrawPerPeriod
-        }`, 'ethers')
+        }`, 'ether')
       )
+      console.log('pool owner rewards')
       await poolConfig.setPoolOwnerRewardsAndLiquidity(0,0)
 
-      await poolConfig.setEvaluationAgent(0, Static.addresses.evaluationAgent)
+      console.log('nftid')
+      await poolConfig.setEvaluationAgent(Static.eaNFTTokenId, Static.addresses.evaluationAgent)
+      console.log('ea rewards')
       await poolConfig.setEARewardsAndLiquidity(0,0)
       await poolConfig.setPoolOwnerTreasury(Static.addresses.poolOwnerTreasury)
       await poolConfig.addPoolOperator(Static.addresses.poolOwner)
@@ -171,17 +162,36 @@ export const usePoolFactory = () => {
     }
   },[])
 
-  const createPool = useCallback(async () => {
+  const createPool = useCallback(async (
+  ) => {
+    console.log('deploying hdt')
     const hdt  = await deployHDT()
+    console.log('deploying poolconfig')
     const poolConfig = await deployPoolConfig(hdt.address)
+    console.log('deploying pool')
     const pool = await deployPool(poolConfig.address)
+    console.log('configuring pool')
     await configurePool(endDate, pool, poolConfig, hdt)
     setPool(pool)
   },[])
 
-
-    return {
-      createPool:createPool,
-      pool:pool
+  useEffect(() => {
+    if (isConnected) {
+      setBorrower(address)
     }
+  }, [isConnected])
+
+  return {
+    name, setName,
+    withdrawPeriodLength, setWithdrawPeriodLength,
+    maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
+    endDate, setEndDate,
+    lenders, setLenders,
+    intervalInDays, setIntervalInDays,
+    aprInBps, setAprInBps,
+    submitTerms,
+    getTerms,
+    createPool
+  }
 }
+

@@ -7,7 +7,7 @@ import { Layout } from '../components/layout/Layout'
 import {
   useProposal,
 } from '../hooks/usePool'
-const Borrow: NextPage = () => {
+const Borrow = () => {
   const {
     name, setName,
     withdrawPeriodLength, setWithdrawPeriodLength,

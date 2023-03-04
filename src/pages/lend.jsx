@@ -6,7 +6,7 @@ import { Layout } from '../components/layout/Layout'
 // import { tw } from 'twind'
 
 
-const Borrow: NextPage = () => {
+const Borrow = () => {
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 

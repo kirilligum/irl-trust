@@ -260,29 +260,14 @@ export const useProposal = () => {
   }
 }
 
-export const usePool = () => {
+export const usePoolA = () => {
   const { address, isConnected } = useAccount()
   const { data:signer, isError, isLoading } = useSigner()
-  const [approved, setApproved] = useState(false)
-  const poolContract = useContract({
-    address: Static.poolA.address,
+  const poolAContract = useContract({
+    address: Static.poolA.addressProxy,
     abi: Static.poolA.abi
   })
 
-  const depositInPool = useCallback(async(amount) => {
-    if (!isError && !isLoading) {
-    }
-  }, [])
-
-  const isApprovedLender = useCallback(async() => {
-    if (!isError && !isLoading) {
-      const isApprovedLender = await poolContract.isApprovedLender(
-        address
-      )
-      setApproved(isApprovedLender)
-    }
-
-  }, [isError, isLoading])
 
   useEffect(() => {
     if (!isLoading && !isError) {

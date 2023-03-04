@@ -25,14 +25,12 @@ export const useProposal = () => {
   const [withdrawPeriodLength, setWithdrawPeriodLength] = useState("day")
   const [maxWithdrawPerPeriod, setMaxWithdrawPerPeriod] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
-  const [endDate, setEndDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
+  console.log('endDate', endDate)
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
   const [aprInBps, setAprInBps]  = useState(30)
-  const [liquidityCap, setLiquidityCap] = useState(
-    ethers.utils.parseUnits('1000000', 'ether')
-  )
-  const [pool,setPool] = useState({})
+  const [poolContract,setPoolContract] = useState(null)
   const { data:signer, isError, isLoading } = useSigner()
   const submitTerms = useCallback(() => {
 
@@ -125,12 +123,13 @@ export const useProposal = () => {
         lenders,
         mapPeriod(withdrawPeriodLength),
         ethers.utils.parseUnits(String(maxWithdrawPerPeriod), 'ether'),
-        Math.floor(endDate.getTime() / 1000),
+        Math.floor(new Date(endDate).getTime() / 1000),
         intervalInDays,
         aprInBps
       )
       await pool.deployed()
-      return  pool 
+      console.log('pool deployed', pool)
+      return pool 
     }
   }, [])
 
@@ -140,14 +139,16 @@ export const useProposal = () => {
       await poolConfig.setPool(pool.address)
       await hdt.setPool(pool.address)
       console.log('liquidity cap')
+      const endTime = Math.floor(new Date(endDate).getTime() / 1000)
+      const startTime = Math.floor(new Date().getTime() / 1000)
+      const duration = endTime - startTime
+      const periods = duration / mapPeriod(withdrawPeriodLength)
+      const liquidityCap = periods * maxWithdrawPerPeriod
+      console.log(liquidityCap)
+      console.log(endTime, startTime, duration, periods)
+      console.log(ethers.utils.parseUnits(String(liquidityCap), 'ether'))
       await poolConfig.setPoolLiquidityCap(
-        ethers.utils.parseUnits(`${
-          (
-            (Math.floor(endDate.getTime() / 1000) - 
-             Math.floor(new Date().getTime() / 1000)) /
-            mapPeriod(withdrawPeriodLength)
-          ) * maxWithdrawPerPeriod
-        }`, 'ether')
+        ethers.utils.parseUnits(String(liquidityCap), 'ether')
       )
       console.log('pool owner rewards')
       await poolConfig.setPoolOwnerRewardsAndLiquidity(0,0)
@@ -159,11 +160,15 @@ export const useProposal = () => {
       await poolConfig.setPoolOwnerTreasury(Static.addresses.poolOwnerTreasury)
       await poolConfig.addPoolOperator(Static.addresses.poolOwner)
       await poolConfig.addPoolOperator(Static.addresses.poolOperator)
+      await poolConfig.setWithdrawalLockoutPeriod(90)
+      await poolConfig.setPoolDefaultGracePeriod(60)
     }
-  },[])
+  }, [])
 
   const createPool = useCallback(async (
   ) => {
+    console.log('enddate', endDate)
+
     console.log('deploying hdt')
     const hdt  = await deployHDT()
     console.log('deploying poolconfig')
@@ -172,8 +177,9 @@ export const useProposal = () => {
     const pool = await deployPool(poolConfig.address)
     console.log('configuring pool')
     await configurePool(endDate, pool, poolConfig, hdt)
-    setPool(pool)
-  },[])
+    setPoolContract(pool)
+    
+  }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
 
   useEffect(() => {
     if (isConnected) {
@@ -182,16 +188,24 @@ export const useProposal = () => {
   }, [isConnected])
 
   return {
-    name, setName,
-    withdrawPeriodLength, setWithdrawPeriodLength,
-    maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
-    endDate, setEndDate,
-    lenders, setLenders,
-    intervalInDays, setIntervalInDays,
-    aprInBps, setAprInBps,
-    submitTerms,
-    getTerms,
-    createPool
+    name:name,
+    setName:setName,
+    withdrawPeriodLength:withdrawPeriodLength,
+    setWithdrawPeriodLength: setWithdrawPeriodLength,
+    maxWithdrawPerPeriod: maxWithdrawPerPeriod,
+    setMaxWithdrawPerPeriod: setMaxWithdrawPerPeriod,
+    endDate:endDate,
+    setEndDate:setEndDate,
+    lenders: lenders,
+    setLenders: setLenders,
+    intervalInDays: intervalInDays,
+    setIntervalInDays: setIntervalInDays,
+    aprInBps: aprInBps,
+    setAprInBps: setAprInBps,
+    submitTerms: submitTerms,
+    getTerms: getTerms,
+    createPool: createPool,
+    poolContract: poolContract
   }
 }
 

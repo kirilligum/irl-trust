@@ -39,11 +39,12 @@ export const useProposal = () => {
   console.log('endDate', endDate)
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
-  const [aprInBps, setAprInBps]  = useState(30)
-  const [poolContract,setPoolContract] = useState(null)
-  const { data:signer, isError, isLoading } = useSigner()
+  const [aprInBps, setAprInBps] = useState(30)
+  const [poolContract, setPoolContract] = useState(null)
+  const { data: signer, isError, isLoading } = useSigner()
   const [repaymentStartDate, setRepaymentStartDate] = useState(new Date())
   const [repaymentEndDate, setRepaymentEndDate] = useState(new Date())
+
   const submitTerms = useCallback(async () => {
     let queryString = `
     mutation {
@@ -76,7 +77,33 @@ export const useProposal = () => {
     console.log("ts: ", ts)
   }, [name, description, maxWithdrawPerPeriod, loanPaidTo, endDate, aprInBps, repaymentEndDate, repaymentEndDate])
 
-  const getTerms = useCallback(() => {
+
+  const getTerms = useCallback(async (streamID) => {
+    let queryString = `
+    query MyQuery {
+      node(id: "${streamID.trim()}") {
+        ... on Irl_Term_Sheet {
+          id
+          PoolName
+          TermsDescription
+          RepaymentStartDate
+          RepaymentEndDate
+          LoanPaidTo
+          LoanEndDate
+          DefaultDays
+          AuthorizedLenders
+          AmountPerPeriod
+          APR
+        }
+      }
+    }
+    `
+
+    console.log(queryString)
+
+    const results = await composeClient.executeQuery(queryString)
+    console.log("results:", results)
+
   }, [])
 
   const deployHDT = useCallback(async () => {
@@ -169,7 +196,7 @@ export const useProposal = () => {
       )
       await pool.deployed()
       console.log('pool deployed', pool)
-      return pool 
+      return pool
     }
   }, [])
 
@@ -218,7 +245,7 @@ export const useProposal = () => {
     console.log('configuring pool')
     await configurePool(endDate, pool, poolConfig, hdt)
     setPoolContract(pool)
-    
+
   }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
 
   useEffect(() => {
@@ -227,14 +254,14 @@ export const useProposal = () => {
     }
   }, [isConnected])
   return {
-    name:name,
-    setName:setName,
-    withdrawPeriodLength:withdrawPeriodLength,
+    name: name,
+    setName: setName,
+    withdrawPeriodLength: withdrawPeriodLength,
     setWithdrawPeriodLength: setWithdrawPeriodLength,
     maxWithdrawPerPeriod: maxWithdrawPerPeriod,
     setMaxWithdrawPerPeriod: setMaxWithdrawPerPeriod,
-    endDate:endDate,
-    setEndDate:setEndDate,
+    endDate: endDate,
+    setEndDate: setEndDate,
     lenders: lenders,
     setLenders: setLenders,
     intervalInDays: intervalInDays,

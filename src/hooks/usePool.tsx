@@ -8,9 +8,10 @@ export const useProposal = () => {
   const [evaluationAgent, setEvaluationAgent] = useState(Static.addresses.evaluationAgent)
   const [poolOwner, setPoolOwner] = useState(Static.addresses.poolOwner)
   const [protocolOwner, setProtocolOwner] = useState(Static.addresses.protocolOwner)
-  const [name, setName] = useState("")
-  const [withdrawPeriodLength, setWithdrawPeriodLength] = useState(0)
+  const [name, setName] = useState("sewing machine")
+  const [withdrawPeriodLength, setWithdrawPeriodLength] = useState("day")
   const [maxWithdrawPerPeriod, setMaxWithdrawPerPeriod] = useState(0)
+  const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
@@ -179,5 +180,8 @@ export const usePoolFactory = () => {
   },[])
 
 
-    return {pool:pool}
+    return {
+      createPool:createPool,
+      pool:pool
+    }
 }

@@ -3,7 +3,7 @@ import { Layout } from '../components/layout/Layout'
 import {
   useProposal,
 } from '../hooks/usePool'
-export const PoolForm = ({handlePoolContract}) => {
+export const PoolForm = ({ handlePoolContract }) => {
   const {
     name, setName,
     withdrawPeriodLength, setWithdrawPeriodLength,
@@ -24,7 +24,7 @@ export const PoolForm = ({handlePoolContract}) => {
 
   useEffect(() => {
     handlePoolContract(poolContract)
-  },[poolContract, handlePoolContract])
+  }, [poolContract, handlePoolContract])
 
   useEffect(() => {
     console.log('useEffect', endDate)
@@ -92,12 +92,12 @@ export const PoolForm = ({handlePoolContract}) => {
       <h3>Growth: withdrawls</h3>
       <h4>linear:</h4>
       <div className='flex-row'>
-        amount per period(USDC):<br/>
+        amount per period(USDC):<br />
         <input
           onChange={(event) => {
             setMaxWithdrawPerPeriod(Number(event.target.value))
           }}
-          className='w-32 text-black' type="float" value={maxWithdrawPerPeriod} />
+          className='w-32 text-black' type="float" defaultValue={maxWithdrawPerPeriod} />
         <button
           onClick={() => {
             setMaxWithdrawPerPeriod(
@@ -125,11 +125,11 @@ export const PoolForm = ({handlePoolContract}) => {
               old => old + 1000
             )
           }}
-          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+1000</button><br/>
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+1000</button><br />
         <div className='flex-row'>
-          Period Length: <br/>
+          Period Length: <br />
           <input
-            className='w-32 text-black' type="text" value={withdrawPeriodLength} />
+            className='w-32 text-black' type="text" defaultValue={withdrawPeriodLength} />
           <button
             onClick={() => {
               setWithdrawPeriodLength('day')
@@ -151,19 +151,21 @@ export const PoolForm = ({handlePoolContract}) => {
             }}
             className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
         </div>
-        Authorized Lenders:<br/>
+        Authorized Lenders:<br />
         {
           [...Array(lendersIter).keys()].map((i) => {
             return (<>
               <input
-                onChange={(event) => {setLenders(old => {
-                  old[i] = event.target.value
-                  return old
-                } )}}
+                onChange={(event) => {
+                  setLenders(old => {
+                    old[i] = event.target.value
+                    return old
+                  })
+                }}
                 key={i} style={{
                   marginBottom: '1px',
                   width: '390px'
-                }} className='text-black' type="text" value={lenders[i]} /><br/></>)
+                }} className='text-black' type="text" value={lenders[i]} /><br /></>)
           })
         }
         <button
@@ -178,13 +180,13 @@ export const PoolForm = ({handlePoolContract}) => {
           className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >+</button>
       </div>
       <div className='flex-row'>
-        end date:<br/>
+        end date:<br />
         <input
           onChange={(event) => {
             console.log('event', event.target.value)
             setEndDate(event.target.value)
           }}
-          className='w-32 text-black' type="date" value={endDate} />
+          className='w-32 text-black' type="date" defaultValue={endDate} />
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
@@ -192,7 +194,7 @@ export const PoolForm = ({handlePoolContract}) => {
       </div>
       <h3>Caring: repayments</h3>
       <div className='flex-row'>
-        APR:<br/>
+        APR:<br />
         <input
           onChange={(event) => {
             setAprInBps(Number(event.target.value))
@@ -203,8 +205,8 @@ export const PoolForm = ({handlePoolContract}) => {
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button>
       </div>
       <div className='flex-row'>
-        start date: <input className='w-32 text-black' type="date" value={
-        new Date().toISOString().split('T')[0]
+        start date: <input className='w-32 text-black' type="date" defaultValue={
+          new Date().toISOString().split('T')[0]
         } /> +
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
@@ -212,8 +214,8 @@ export const PoolForm = ({handlePoolContract}) => {
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
       </div>
       <div className='flex-row'>
-        end date: <input className='w-32 text-black' type="date" value={
-        new Date().toISOString().split('T')[0]
+        end date: <input className='w-32 text-black' type="date" defaultValue={
+          new Date().toISOString().split('T')[0]
         } />+
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
         <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>

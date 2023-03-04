@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ceramicnetwork/common": "^2.23.0",
+    "@ceramicnetwork/http-client": "^2.20.0",
+    "@composedb/client": "^0.4.3",
+    "@composedb/types": "^0.4.3",
+    "@didtools/pkh-ethereum": "^0.2.1",
     "@web3modal/ethereum": "2.0.0-beta.6",
     "@web3modal/react": "2.0.0-beta.6",
     "autoprefixer": "^10.4.13",
+    "did-session": "^2.0.0",
     "ethers": "^5.7.2",
     "next": "^13.0.0",
     "react": "^18.2.0",

@@ -8,9 +8,29 @@ import '../styles/globals.css'
 
 import { chains, client, walletConnectProjectId } from '../wagmi'
 
+//ceramic stuff
+import { CeramicWrapper } from "../composedb/context";
+import { useCeramicContext } from '../composedb/context';
+import { authenticateCeramic } from '../composedb/utils'
+
 const ethereumClient = new EthereumClient(client, chains)
 
 function App({ Component, pageProps }: AppProps) {
+
+  //ceramic stuff
+  const clients = useCeramicContext()
+  const { ceramic, composeClient } = clients
+  const handleLogin = async () => {
+    await authenticateCeramic(ceramic, composeClient)
+    // await getProfile()
+    console.log("ceramic")
+    console.log(ceramic.did)
+  }
+
+  React.useEffect(() => {
+    handleLogin()
+  }, [])
+
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   return (

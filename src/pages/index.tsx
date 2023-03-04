@@ -1,10 +1,26 @@
-
+import { useEffect, useState } from 'react';
 import { Layout } from '../components/layout/Layout'
 // import { Borrow } from '../components/Borrow'
 // import { Lend } from '../components/Lend'
 import { Head } from '../components/layout/Head'
 
+
+
+import { useAccount, useProvider, useSigner, useBalance } from "wagmi";
+
 function Page() {
+
+
+  //wallet status
+  const provider = useProvider()
+  const { data: signer, isError, isLoading } = useSigner()
+  const { address, isConnected } = useAccount()
+  useEffect(() => {
+    console.log("connection status...", isConnected)
+    console.log("Addresss: ", address)
+  }, [isConnected]);
+
+
 
   return (
     <Layout>
@@ -26,6 +42,9 @@ function Page() {
         {/* <Borrow /> */}
         {/* <Lend /> */}
         <div className="p-4"></div>
+
+        {/* <button onClick={() => createTermsheet()}>create termsheet</button> */}
+
       </div>
     </Layout>
   )

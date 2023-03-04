@@ -90,6 +90,16 @@ async function deployContracts(
     .connect(protocolOwner)
     .setLiquidityAsset(testTokenContract.address, true);
 
+  let eaNFTTokenId;
+  // Mint EANFT to the ea
+  const tx = await eaNFTContract.mintNFT(evaluationAgent.address);
+  const receipt = await tx.wait();
+  for (const evt of receipt.events) {
+    if (evt.event === "NFTGenerated") {
+      eaNFTTokenId = evt.args.tokenId;
+    }
+  }
+  console.log('nfts generated')
 
   await testTokenContract.mint(lenderA.address, toToken(10_000_000));
   await testTokenContract.mint(lenderB.address, toToken(10_000_000));
@@ -99,19 +109,19 @@ async function deployContracts(
   await feeManagerContract.connect(poolOwner).setMinPrincipalRateInBps(principalRateInBps);
 
   fs.writeFileSync('../src/public/Static.json', JSON.stringify({
-    testToken: {
+    TestToken: {
       address: testTokenContract.address,
       abi: require('../artifacts/contracts/mock/TestToken.sol/TestToken.json').abi
     },
-    poolStarter: {
+    PoolStarter: {
       address: poolStarter.address,
       abi: require('../artifacts/contracts/PoolStarter.sol/PoolStarter.json').abi
     },
-    eaNFTContract: {
+    EaNFTContract: {
       address: eaNFTContract.address,
       abi: require('../artifacts/contracts/EvaluationAgentNFT.sol/EvaluationAgentNFT.json').abi
     },
-    humaConfig: {
+    HumaConfig: {
       address: humaConfigContract.address,
       abi: require('../artifacts/contracts/HumaConfig.sol/HumaConfig.json').abi
     },
@@ -119,14 +129,31 @@ async function deployContracts(
       address: feeManagerContract.address,
       abi: require('../artifacts/contracts/BaseFeeManager.sol/BaseFeeManager.json').abi
     },
+    TransparentUpgradeableProxy: {
+      abi: require('../artifacts/@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json').abi,
+      bytecode: require('../artifacts/@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json').bytecode,
+    },
+    HDT: {
+      abi: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').abi,
+      bytecode: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').bytecode,
+    },
+    PoolConfig: {
+      abi: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').abi,
+      bytecode: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').bytecode,
+    },
+    BaseCreditPool: {
+      abi: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').abi,
+      bytecode: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').bytecode,
+    },
     addresses: {
-      poolOwner,
-      poolOperator,
-      poolOwnerTreasury,
-      protocolOwner,
-      eaServiceAccount,
-      pdsServiceAccount,
-      evaluationAgent
+      poolOwner: poolOwner.address,
+      poolOperator: poolOperator.address,
+      poolOwnerTreasury: poolOwnerTreasury.address,
+      protocolOwner: protocolOwner.address,
+      eaServiceAccount: eaServiceAccount.address,
+      pdsServiceAccount: pdsServiceAccount.address,
+      evaluationAgent: evaluationAgent.address,
+      proxyOwner: proxyOwner.address
     }
   }))
 }

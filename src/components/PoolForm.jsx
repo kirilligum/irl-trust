@@ -8,6 +8,9 @@ export const PoolForm = ({handlePoolContract}) => {
     name, setName,
     withdrawPeriodLength, setWithdrawPeriodLength,
     maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
+    description, setDescription,
+    RepaymentStartDate, setRepaymentStartDate,
+    RepaymentEndDate, setRepaymentEndDate,
     endDate, setEndDate,
     lenders, setLenders,
     intervalInDays, setIntervalInDays,
@@ -43,7 +46,7 @@ export const PoolForm = ({handlePoolContract}) => {
       desc:
       <input
         onChange={(event) => {
-          // setDescription
+          setDescription(event.target.value)
         }}
         className='w-128 text-black' name="desc" type="text" defaultValue={"sewing maching to start a business"} />
       <h2>Terms</h2>

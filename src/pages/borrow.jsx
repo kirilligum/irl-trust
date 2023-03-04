@@ -14,15 +14,19 @@ import {
 const Borrow = () => {
   const {
     name, setName,
+    description, setDescription,
+    loanPaidTo, setLoanPaidTo,
     withdrawPeriodLength, setWithdrawPeriodLength,
     maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
     endDate, setEndDate,
+    RepaymentStartDate, setRepaymentStartDate,
+    RepaymentEndDate, setRepaymentEndDate,
     lenders, setLenders,
     intervalInDays, setIntervalInDays,
     aprInBps, setAprInBps,
     submitTerms,
     getTerms,
-    createPool,
+    createPool
   } = useProposal()
   const [lendersIter, setLendersIter] = useState(1)
   // const { initClient, client } = useContext(XmtpContext)
@@ -62,7 +66,7 @@ const Borrow = () => {
         desc:
         <input
           onChange={(event) => {
-            // setDescription
+            setDescription(event.target.value)
           }}
           className='w-128 text-black' name="desc" type="text" defaultValue={"sewing maching to start a business"} />
         <h2>Terms</h2>
@@ -145,7 +149,9 @@ const Borrow = () => {
           <div className='flex-row'>
             Period Length: <br />
             <input
-              className='w-32 text-black' type="text" defaultValue={withdrawPeriodLength} />
+              className='w-32 text-black' type="text" defaultValue={withdrawPeriodLength}
+              onChange={(event) => { setWithdrawPeriodLength(event.target.value) }}
+            />
             <button
               onClick={() => {
                 setWithdrawPeriodLength('day')
@@ -218,14 +224,18 @@ const Borrow = () => {
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button>
         </div>
         <div className='flex-row'>
-          start date: <input className='w-32 text-black' type="date" defaultValue={todayDate} /> +
+          start date: <input className='w-32 text-black' type="date" defaultValue={todayDate}
+            onChange={(event) => { setRepaymentStartDate(new Date(event.target.value)) }}
+          /> +
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
         </div>
         <div className='flex-row'>
-          end date: <input className='w-32 text-black' type="date" defaultValue={todayDate} />+
+          end date: <input className='w-32 text-black' type="date" defaultValue={todayDate}
+            onChange={(event) => { setRepaymentEndDate(new Date(event.target.value)) }}
+          />+
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
           <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>

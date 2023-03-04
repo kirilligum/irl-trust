@@ -28,10 +28,15 @@ export const useProposal = () => {
   const [poolOwner, setPoolOwner] = useState(Static.addresses.poolOwner)
   const [protocolOwner, setProtocolOwner] = useState(Static.addresses.protocolOwner)
   const [name, setName] = useState("sewing machine")
+  const [description, setDescription] = useState("Description")
+  const [loanPaidTo, setLoanPaidTo] = useState("Recipient Address")
+
   const [withdrawPeriodLength, setWithdrawPeriodLength] = useState("day")
   const [maxWithdrawPerPeriod, setMaxWithdrawPerPeriod] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
+  const [repaymentStartDate, setRepaymentStartDate] = useState(new Date())
+  const [repaymentEndDate, setRepaymentEndDate] = useState(new Date())
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
   const [aprInBps, setAprInBps] = useState(30)
@@ -46,14 +51,14 @@ export const useProposal = () => {
     mutation {
       createIrl_Term_Sheet(input:{
         content:{
-          PoolName: "TESTDATA"
-          TermsDescription: "TESTDATA"
-          AmountPerPeriod: "500"
-          LoanPaidTo: "0x8243hj32jhdfsjhhgjfds"
-          LoanEndDate: "2023-09-20"
-          APR: "6.23"
-          RepaymentStartDate: "2023-04-20"
-          RepaymentEndDate: "2023-12-20"
+          PoolName: "${name}"
+          TermsDescription: "${description}"
+          AmountPerPeriod: "${maxWithdrawPerPeriod}"
+          LoanPaidTo: "${loanPaidTo}"
+          LoanEndDate: "${endDate}"
+          APR: "${aprInBps * 100}"
+          RepaymentStartDate: "${repaymentStartDate}"
+          RepaymentEndDate: "${repaymentEndDate}"
           URL: "https://irltrust.xyz/djc8s"
         }
       })
@@ -67,9 +72,12 @@ export const useProposal = () => {
       }
     }
     `
-    const ts = await composeClient.executeQuery(queryString)
 
     console.log("querystring: ", queryString)
+
+
+
+    const ts = await composeClient.executeQuery(queryString)
     console.log("ts: ", ts)
   }, [])
 
@@ -217,9 +225,13 @@ export const useProposal = () => {
 
   return {
     name, setName,
+    description, setDescription,
+    loanPaidTo, setLoanPaidTo,
     withdrawPeriodLength, setWithdrawPeriodLength,
     maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
     endDate, setEndDate,
+    repaymentStartDate, setRepaymentStartDate,
+    repaymentEndDate, setRepaymentEndDate,
     lenders, setLenders,
     intervalInDays, setIntervalInDays,
     aprInBps, setAprInBps,

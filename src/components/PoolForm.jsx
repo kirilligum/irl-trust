@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
+import { useNetwork } from 'wagmi'
 import { Layout } from '../components/layout/Layout'
 import {
   useProposal,
@@ -356,7 +357,7 @@ export const PoolForm = ({ handlePoolContract }) => {
       <button
         onClick={async () => {
           await submitTerms()
-          await createPool()
+          // await createPool()
         }}
         className='p-2 bg-orange-600'>Initialize Pool
       </button>

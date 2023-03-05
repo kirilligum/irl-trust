@@ -83,3 +83,12 @@ to run basic workflow tests
 to preset for web integration
 `npx hardhat run ./scripts/irl-trust-predeploy`
 
+## Bounties
+
+### Ceramic
+We use ceramic to store loan contract term sheets. Modeled after ceramic's workshop, the ceramic2 submodule spins up a ceramic node plus a graphiql server. The run time composite enables the frontend to execute graphql queries. 
+In this video, when a borrower initiates a lending pool, the browser console logs the query string and sees it was successful as the streamID is shown. Through a query on the graphiql server we can also see that the new data was written to ceramic.
+https://youtu.be/7r-PXMzLgq8
+
+### Metamask
+Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. 

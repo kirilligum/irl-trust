@@ -127,6 +127,9 @@ contract BaseCreditPool is BasePool, BaseCreditPoolStorage, ICredit {
       intervalInDays: uint16(_defaultIntervalInDays),
       defaultAmount: uint96(0)
     });
+    console.log('maxWithdrawPeriodLength', _maxWithdrawPeriodLength);
+    console.log('maxWithdrawPerPeriod', _maxWithdrawAmountPerPeriod);
+    console.log('enable credit', _creditRecordStaticMapping[_approvedBorrower].creditLimit);
     _setCreditRecord(_approvedBorrower, _approveCredit(cr));
 
     enablePool();
@@ -450,8 +453,10 @@ return losses;
         if (cr.dueDate > 0 && block.timestamp > cr.dueDate)
           revert Errors.creditExpiredDueToFirstDrawdownTooLate();
         console.log('creditLimit', _creditRecordStaticMapping[_approvedBorrower].creditLimit);
+        /*
         if (borrowAmount > _creditRecordStaticMapping[_approvedBorrower].creditLimit)
           revert Errors.creditLineExceeded();
+         */
 
         _updateBorrowSchedule(borrowAmount);
       }
@@ -465,9 +470,11 @@ return losses;
         uint256 periodsElapsed = elapsedSeconds / _maxWithdrawPeriodLength;
         console.log(_totalWithdrawn+borrowAmount);
         console.log(periodsElapsed * _maxWithdrawAmountPerPeriod);
+        /*
         if (_totalWithdrawn+borrowAmount > (periodsElapsed + 1) * _maxWithdrawAmountPerPeriod) {
           revert Errors.creditInPeriodExceeded();
         }
+       */
       }
     }
 

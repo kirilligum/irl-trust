@@ -48,11 +48,14 @@ export const useProposal = () => {
   const submitTerms = useCallback(async () => {
     let queryString = `
     mutation {
-      createIrl_Term_Sheet(input:{
+      createIrlTermsheet(input:{
         content:{
           PoolName: "${name}"
+          PoolAddress: "${poolContract}"
           TermsDescription: "${description}"
           AmountPerPeriod: "${maxWithdrawPerPeriod}"
+          WithdrawPeriodLength: "${withdrawPeriodLength}"
+          AuthorizedLenders: " ${lenders.join(', ')}"
           LoanPaidTo: "${loanPaidTo}"
           LoanEndDate: "${endDate}"
           APR: "${aprInBps * 100}"
@@ -75,34 +78,44 @@ export const useProposal = () => {
 
     const ts = await composeClient.executeQuery(queryString)
     console.log("ts: ", ts)
-  }, [name, description, maxWithdrawPerPeriod, loanPaidTo, endDate, aprInBps, repaymentEndDate, repaymentEndDate])
+  }, [name, description, maxWithdrawPerPeriod, loanPaidTo, endDate, aprInBps, repaymentEndDate, repaymentEndDate, poolContract])
 
 
-  const getTerms = useCallback(async (streamID) => {
+  const getTerms = useCallback(async (_poolAddress) => {
+    console.log("PooolaAddress: ", _poolAddress)
     let queryString = `
+    
     query MyQuery {
-      node(id: "${streamID.trim()}") {
-        ... on Irl_Term_Sheet {
-          id
-          PoolName
-          TermsDescription
-          RepaymentStartDate
-          RepaymentEndDate
-          LoanPaidTo
-          LoanEndDate
-          DefaultDays
-          AuthorizedLenders
-          AmountPerPeriod
-          APR
+      irlTermsheetIndex(last: 50){
+        edges{
+          node{
+            PoolName
+            PoolAddress
+            TermsDescription
+            AmountPerPeriod
+            WithdrawPeriodLength
+            AuthorizedLenders
+            LoanPaidTo
+            LoanEndDate
+            APR
+            RepaymentStartDate
+            RepaymentEndDate
+            DefaultDays
+            URL
+          } 
         }
-      }
+      }  
     }
     `
+    // console.log(queryString)
 
-    console.log(queryString)
+    let results = await composeClient.executeQuery(queryString)
+    results = results.data.irlTermsheetIndex.edges
+    let match = results.filter(item => { return item.node.PoolAddress === _poolAddress })
+    match = match[0].node
+    console.log("results:", match)
 
-    const results = await composeClient.executeQuery(queryString)
-    console.log("results:", results)
+    return match
 
   }, [])
 

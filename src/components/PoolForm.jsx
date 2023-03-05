@@ -20,8 +20,10 @@ export const PoolForm = ({ handlePoolContract }) => {
     submitTerms,
     poolContract
   } = useProposal()
+
   const [lendersIter, setLendersIter] = useState(1)
-  const [streamID, setStreamID] = useState('')
+  const [poolAddress, setPoolAddress] = useState("")
+
 
   useEffect(() => {
     handlePoolContract(poolContract)
@@ -232,21 +234,14 @@ export const PoolForm = ({ handlePoolContract }) => {
         className='p-2 bg-orange-600'>Initialize Pool
       </button>
 
-      <br></br>
-      <input className='w-300 text-black'
-        onChange={(event) => {
-          setStreamID(event.target.value)
-        }}
-      />
+      <br />
+
+      <input style={{ color: 'blue' }} onChange={(event) => { setPoolAddress(event.target.value) }} />
+
       <button
         className='p-2 bg-orange-300'
-        onClick={() => getTerms(streamID)
+        onClick={() => getTerms(poolAddress)
         }
-
-        onChange={(event) => {
-          setMaxWithdrawPerPeriod(Number(event.target.value))
-        }}
-
       >
         Get Pool Terms Info
       </button>

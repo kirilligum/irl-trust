@@ -101,6 +101,8 @@ we use USDC for all loans as it's the simplest way to provide unit of measure. P
 
 ### Metamask
 Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. This was built on the Snappy recovery repo by Ziad. We've enabled recovery from just 2 lenders. With more time we would have liked to streamline the recovery process so that in our dapp's workflow, recovery can be set up automatically by default. 
-https://youtu.be/Mz9xfJ4lZwM
+https://youtu.be/FroCueniXcY
+
+
 
 

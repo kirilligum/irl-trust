@@ -270,7 +270,6 @@ export const useProposal = () => {
     await enablePool(pool.address)
     setPoolContract(pool)
     localStorage.setItem("pool", JSON.stringify({pool: pool.address, poolProxy:poolProxy.address}))
-    
   }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
 
 

@@ -28,7 +28,7 @@ function Page() {
       <div className="flex flex-col">
         <h1>lens</h1>
         <div>username: juju</div>
-        <div>sortest path: me-->bill-->Lydia-->juju</div>
+        <div>sortest path: me → bill → Lydia → juju</div>
         <div>score: 82.5</div>
         <h1>ongoing loans</h1>
         <table>

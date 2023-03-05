@@ -208,18 +208,11 @@ module.exports = {
             accounts: [deployer, eaService],
         },
         mumbai: {
-            url: mumbaiUrl,
-            accounts: [
-                deployer,
-                proxyOwner,
-                lender,
-                ea,
-                eaService,
-                pdsService,
-                treasury,
-                ea_bcp,
-                invoicePayer,
-            ],
+          chainId: 80001,
+          url: process.env.MUMBAI_URL,
+          accounts: {
+            mnemonic: process.env.MNEMONIC
+          }
         },
         matic: {
             url: polygonUrl,

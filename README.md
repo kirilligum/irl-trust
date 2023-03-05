@@ -49,6 +49,7 @@ User flow
 This is a [Next.js](https://nextjs.org) + [Web3Modal](https://web3modal.com/) + [wagmi](https://wagmi.sh) project bootstrapped with [`create-wagmi`](https://github.com/wagmi-dev/wagmi/tree/main/packages/create-wagmi)
 
 # Getting Started
+`git clone --recurse-submodules https://github.com/kirilligum/irl-trust`
 
 ## Running submodules:
 To demo this project, we first need to run 2 submodules: ceramic2 & snappy-recovery 
@@ -62,7 +63,23 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
 ## main webapp
 After running all the dependencies above... run the main webapp:
 
-```npm run dev``` 
+``` cd src && npm install && npm run dev``` 
 
 Since a submodule is already running a webapp, this main webapp should open at localhost:3001
+
+### contracts
+
+`cd huma-contracts && yarn install`
+`cp .env.example .env`
+fill out mnemonic from a development metamask
+(bottom of file, wrap in single quotes)
+`npx hardhat node`
+
+(new terminal)
+
+to run basic workflow tests
+`npx hardhat test ./test/IrlTrustTest.js`
+
+to preset for web integration
+`npx hardhat run ./scripts/irl-trust-predeploy`
 

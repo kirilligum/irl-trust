@@ -16,17 +16,27 @@ import {
 const Borrow = () => {
   const [lendersIter, setLendersIter] = useState(1)
   const [pool, setPool] = useState(null)
-
-  const [poolAddr, setPoolAddr] = useState(JSON.parse(
-    localStorage.getItem("pool")
-  ).pool)
-  const {poolAmount, getPoolAmount, withdraw} = usePool(poolAddr)
+  const [repayAmount, setRepayAmount] = useState("")
+  const [poolAddr, setPoolAddr] = useState(null)
+  const {poolAmount, getPoolAmount, drawdown, repay} = usePool()
   const [lenders, setLenders] = useState([])
   useEffect(() => {
     if (poolAddr) {
-      getPoolAmount()
     }
   }, [poolAddr])
+
+  useEffect(() => {
+    try {
+      const lsPool = JSON.parse(
+        localStorage.getItem("pool")
+      ).pool
+      setPoolAddr(lsPool)
+      getPoolAmount(lsPool)
+      poolAmount(pool)
+    } catch (e) {
+      
+    }
+  }, [])
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 
@@ -102,9 +112,17 @@ const Borrow = () => {
             <td>{poolAmount}</td>
             <td>USDC</td>
             <td>%50</td>
-            <td><button
-              onClick={async () => { await withdraw() }}
-            className='p-2 rounded-xl bg-green-600'>withdraw</button></td>
+            <td>
+              {(poolAmount > 0) ? 
+                (<button
+              onClick={async () => { await drawdown(poolAddr) }}
+                  className='p-2 rounded-xl bg-green-600'>drawdown</button>):
+                  (<><button onClick={async () => { await repay(poolAddr, repayAmount) }}
+                  className='p-2 rounded-xl bg-red-600'>makePayment
+                  </button>
+                    <input style={{width:'45px', color:'black'}} type="text" value={repayAmount} onChange={(event) => setRepayAmount(event.target.value)}/>
+                  </>)
+            }</td>
           </tr>
           <tr>
             <td>03/11/2023</td>

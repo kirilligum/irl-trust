@@ -13,7 +13,7 @@ const Lend = () => {
     amount,
     approve,
     setAmount
-  } = usePool(pool)
+  } = usePool()
 
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
@@ -68,8 +68,8 @@ const Lend = () => {
         </div>
         <button
           onClick={async () => {
-            await approve()
-            await deposit()
+            await approve(pool)
+            await deposit(pool)
           }}
           className='p-2 bg-orange-600'>send funds</button>
         <div className='flex-row'>

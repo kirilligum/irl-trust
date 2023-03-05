@@ -1,6 +1,16 @@
 import { useState, useCallback, useEffect } from 'react'
-import { ethers } from 'ethers'
+import { ethers, BigNumber } from 'ethers'
 import { useAccount, useContract, useSigner } from 'wagmi'
+export const toBigNumber = (num) => {
+  try {
+    return BigNumber.from(num)
+
+  } catch (e) {
+    return BigNumber.from(Number(num).toFixed(0))
+
+  }
+
+} 
 import Static from '../public/Static.json'
 
 import { useCeramicContext } from '../composedb/context'
@@ -202,7 +212,7 @@ export const useProposal = () => {
         address,
         lenders,
         mapPeriod(withdrawPeriodLength),
-        ethers.utils.parseUnits(String(maxWithdrawPerPeriod), 'ether'),
+        toBigNumber(maxWithdrawPerPeriod),
         Math.floor(new Date(endDate).getTime() / 1000),
         intervalInDays,
         aprInBps
@@ -226,9 +236,8 @@ export const useProposal = () => {
       const liquidityCap = periods * maxWithdrawPerPeriod
       console.log(liquidityCap)
       console.log(endTime, startTime, duration, periods)
-      console.log(ethers.utils.parseUnits(String(liquidityCap), 'ether'))
       await poolConfig.setPoolLiquidityCap(
-        ethers.utils.parseUnits(String(liquidityCap), 'ether')
+        toBigNumber(liquidityCap)
       )
       console.log('pool owner rewards')
       await poolConfig.setPoolOwnerRewardsAndLiquidity(0, 0)
@@ -306,13 +315,36 @@ export const useProposal = () => {
   }
 }
 
-export const usePool = (pool) => {
+export const usePool = () => {
   const { address, isConnected } = useAccount()
   const { data:signer, isError, isLoading } = useSigner()
   const [amount, setAmount] = useState(0)
   const [poolAmount, setPoolAmount] = useState(0)
 
-  const withdraw = useCallback(async () => {
+  const repay = useCallback(async (pool, rpAmount) => {
+    if (!isLoading && !isError) {
+      const tokenContract = new ethers.Contract(
+        Static.TestToken.address,
+        Static.TestToken.abi,
+        signer
+      )
+      console.log(amount, pool)
+      const approveRes = await tokenContract.approve(
+        pool,
+        toBigNumber(rpAmount)
+      )
+      const poolContract = new ethers.Contract(
+        pool,
+        Static.BaseCreditPool.abi,
+        signer
+      )
+      const res = await poolContract.makePayment(
+        toBigNumber(rpAmount)
+      )
+
+    }
+  }, [isLoading, isError  ])
+  const drawdown = useCallback(async (pool) => {
     if (!isLoading && !isError) {
       const poolContract = new ethers.Contract(
         pool,
@@ -320,13 +352,13 @@ export const usePool = (pool) => {
         signer
       )
       console.log(poolAmount)
-      console.log(Number(ethers.utils.parseUnits(String(1), 0)))
-      const res = await poolContract.withdraw(
-        ethers.utils.parseUnits(String(1),1)
+      const res = await poolContract.drawdown(
+        toBigNumber(poolAmount)
       )
+      getPoolAmount(pool)
     }
-  }, [isLoading, isError, pool, poolAmount])
-  const getPoolAmount = useCallback(async () => {
+  }, [isLoading, isError, poolAmount])
+  const getPoolAmount = useCallback(async (pool) => {
     if (!isLoading && !isError) {
       const tokenContract = new ethers.Contract(
         Static.TestToken.address,
@@ -334,10 +366,10 @@ export const usePool = (pool) => {
         signer
       )
       const res = await tokenContract.balanceOf(pool)
-      setPoolAmount(ethers.utils.formatUnits(res, 6))
+      setPoolAmount(Number(res))
     }
   })
-  const approve = useCallback(async () => {
+  const approve = useCallback(async (pool) => {
     if (!isLoading && !isError) {
       const tokenContract = new ethers.Contract(
         Static.TestToken.address,
@@ -347,13 +379,13 @@ export const usePool = (pool) => {
       console.log(amount, pool)
       const res = await tokenContract.approve(
         pool,
-        ethers.utils.parseUnits(String(amount), '6')
+        toBigNumber(amount)
       )
       console.log(res)
     }
-  }, [isLoading, isError, poolAmount, pool])
+  }, [isLoading, isError, poolAmount, amount])
 
-  const deposit = useCallback(async() => {
+  const deposit = useCallback(async(pool) => {
     if (!isLoading && !isError) {
       const poolContract = new ethers.Contract(
         pool,
@@ -361,8 +393,10 @@ export const usePool = (pool) => {
         signer
       )
       console.log(poolContract)
+      console.log('deposit', amount, toBigNumber(amount),
+      Number(toBigNumber(amount)))
       const res = await poolContract.deposit(
-        ethers.utils.parseUnits(String(amount), '6')
+        toBigNumber(amount)
       )
       console.log('res', res)
     }
@@ -380,6 +414,7 @@ export const usePool = (pool) => {
     setAmount: setAmount,
     poolAmount: poolAmount,
     getPoolAmount: getPoolAmount,
-    withdraw: withdraw
+    drawdown: drawdown,
+    repay: repay
   }
 }

@@ -54,6 +54,17 @@ Run `npm run dev` in your terminal, and then open [localhost:3000](http://localh
 
 Once the webpage has loaded, changes made to files inside the `src/` directory (e.g. `src/pages/index.tsx`) will automatically update the webpage.
 
+## Running submodules:
+To demo this project, we need to run 2 submodules: ceramic2 & snappy-recovery (details in each folder's readme)
+
+This is resource intensive. If you encounter the error "ENOSPC: System limit for number of file watchers reached"
+You can run this:
+```
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+```
+
+
+
 # Learn more
 
 To learn more about [Next.js](https://nextjs.org) or [wagmi](https://wagmi.sh), check out the following resources:

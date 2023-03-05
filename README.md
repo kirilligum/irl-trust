@@ -50,27 +50,19 @@ This is a [Next.js](https://nextjs.org) + [Web3Modal](https://web3modal.com/) + 
 
 # Getting Started
 
-Run `npm run dev` in your terminal, and then open [localhost:3000](http://localhost:3000) in your browser.
-
-Once the webpage has loaded, changes made to files inside the `src/` directory (e.g. `src/pages/index.tsx`) will automatically update the webpage.
-
 ## Running submodules:
-To demo this project, we need to run 2 submodules: ceramic2 & snappy-recovery (details in each folder's readme)
+To demo this project, we first need to run 2 submodules: ceramic2 & snappy-recovery 
+Open each folder to see Readme for detailed steps on how to run them.
 
 This is resource intensive. If you encounter the error "ENOSPC: System limit for number of file watchers reached"
 You can run this:
 ```
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 ```
+## main webapp
+After running all the dependencies above... run the main webapp:
 
+```npm run dev``` 
 
+Since a submodule is already running a webapp, this main webapp should open at localhost:3001
 
-# Learn more
-
-To learn more about [Next.js](https://nextjs.org) or [wagmi](https://wagmi.sh), check out the following resources:
-
-- [wagmi Documentation](https://wagmi.sh) – learn about wagmi Hooks and API.
-- [wagmi Examples](https://wagmi.sh/examples/connect-wallet) – a suite of simple examples using wagmi.
-- [Web3Modal Documentation](https://web3modal.com) – learn more about Web3Modal (configuration, theming, advanced usage, etc).
-- [Next.js Documentation](https://nextjs.org/docs) learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.

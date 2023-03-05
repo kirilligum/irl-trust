@@ -1,0 +1,3 @@
+[submodule "snappy-recovery"]
+	path = snappy-recovery
+	url = https://github.com/alinobrasil/irl-trust-snappy-recovery

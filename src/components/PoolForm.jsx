@@ -9,8 +9,8 @@ export const PoolForm = ({ handlePoolContract }) => {
     withdrawPeriodLength, setWithdrawPeriodLength,
     maxWithdrawPerPeriod, setMaxWithdrawPerPeriod,
     description, setDescription,
-    RepaymentStartDate, setRepaymentStartDate,
-    RepaymentEndDate, setRepaymentEndDate,
+    repaymentStartDate, setRepaymentStartDate,
+    repaymentEndDate, setRepaymentEndDate,
     endDate, setEndDate,
     lenders, setLenders,
     intervalInDays, setIntervalInDays,
@@ -32,6 +32,7 @@ export const PoolForm = ({ handlePoolContract }) => {
   useEffect(() => {
     console.log('useEffect', endDate)
   }, [endDate])
+
 
   return (
     <>
@@ -185,23 +186,54 @@ export const PoolForm = ({ handlePoolContract }) => {
           }
           className="m-1 h-8 w-16 items-center justify-center rounded-md bg-blue-600 " >+</button>
       </div>
-      <div className='flex-row'>
+      <div className='flex flex-row items-center'>
         end date:<br />
         <input
           onChange={(event) => {
             console.log('event', event.target.value)
             setEndDate(event.target.value)
           }}
-          className='w-32 text-black' type="date" value={endDate} />
+          className='w-32 h-6 mx-2 text-black' type="date" value={endDate} /> +
         <button
-          onChange={(event) => {
-            console.log('event', event.target.value)
-            setEndDate(Date(Date(event.target.value) + 1))
+          onClick={() => {
+            setEndDate(() => {
+              var result = new Date(endDate)
+              result.setDate(result.getDate() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
           }}
           className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
+        <button
+          onClick={() => {
+            setEndDate(() => {
+              var result = new Date(endDate)
+              result.setDate(result.getDate() + 7)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
+        <button
+          onClick={() => {
+            setEndDate(() => {
+              var result = new Date(endDate)
+              result.setMonth(result.getMonth() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
+        <button
+          onClick={() => {
+            setEndDate(() => {
+              var result = new Date(endDate)
+              result.setFullYear(result.getFullYear() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
       </div>
       <h3>Caring: repayments</h3>
       <div className='flex-row'>
@@ -210,28 +242,115 @@ export const PoolForm = ({ handlePoolContract }) => {
           onChange={(event) => {
             setAprInBps(Number(event.target.value))
           }}
-          className='w-32 text-black' type="float" value={aprInBps} />% +
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.01</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.10</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button>
+          className='w-16 text-black' type="float" value={aprInBps} /> % +
+        <button
+          onClick={() => { setAprInBps(() => aprInBps + 0.01) }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.01</button>
+        <button
+          onClick={() => { setAprInBps(() => aprInBps + 0.1) }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >.10</button>
+        <button
+          onClick={() => { setAprInBps(() => aprInBps + 1) }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >1</button> %
       </div>
-      <div className='flex-row'>
-        start date: <input className='w-32 text-black' type="date" defaultValue={
-          new Date().toISOString().split('T')[0]
-        } /> +
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
-      </div>
-      <div className='flex-row'>
-        end date: <input className='w-32 text-black' type="date" defaultValue={
-          new Date().toISOString().split('T')[0]
-        } />+
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
-        <button className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
+      <div className='flex flex-row items-center'>
+        start date:<br />
+        <input
+          onChange={(event) => {
+            console.log('event', event.target.value)
+            setRepaymentStartDate(event.target.value)
+          }}
+          className='w-32 h-6 mx-2 text-black' type="date"
+          value={repaymentStartDate} /> +
+        <button
+          onClick={() => {
+            setRepaymentStartDate(() => {
+              var result = new Date(repaymentStartDate)
+              result.setDate(result.getDate() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
+        <button
+          onClick={() => {
+            setRepaymentStartDate(() => {
+              var result = new Date(repaymentStartDate)
+              result.setDate(result.getDate() + 7)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
+        <button
+          onClick={() => {
+            setRepaymentStartDate(() => {
+              var result = new Date(repaymentStartDate)
+              result.setMonth(result.getMonth() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " > M</button >
+        <button
+          onClick={() => {
+            setRepaymentStartDate(() => {
+              var result = new Date(repaymentStartDate)
+              result.setFullYear(result.getFullYear() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
+      </div >
+      <div className='flex flex-row items-center'>
+        end date:<br />
+        <input
+          onChange={(event) => {
+            console.log('event', event.target.value)
+            setRepaymentEndDate(event.target.value)
+          }}
+          className='w-32 h-6 mx-2 text-black' type="date" value={repaymentEndDate} /> +
+        <button
+          onClick={() => {
+            setRepaymentEndDate(() => {
+              var result = new Date(repaymentEndDate)
+              result.setDate(result.getDate() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Day</button>
+        <button
+          onClick={() => {
+            setRepaymentEndDate(() => {
+              var result = new Date(repaymentEndDate)
+              result.setDate(result.getDate() + 7)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >W</button>
+        <button
+          onClick={() => {
+            setRepaymentEndDate(() => {
+              var result = new Date(repaymentEndDate)
+              result.setMonth(result.getMonth() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >M</button>
+        <button
+          onClick={() => {
+            setRepaymentEndDate(() => {
+              var result = new Date(repaymentEndDate)
+              result.setFullYear(result.getFullYear() + 1)
+              return result.toISOString().split('T')[0]
+            }
+            )
+          }}
+          className="m-1 h-12 w-12 items-center justify-center rounded-full bg-blue-600 " >Y</button>
       </div>
       <p>90 days to default</p>
       <button

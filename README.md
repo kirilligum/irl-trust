@@ -91,4 +91,6 @@ In this video, when a borrower initiates a lending pool, the browser console log
 https://youtu.be/7r-PXMzLgq8
 
 ### Metamask
-Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. 
+Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. This was built on the Snappy recovery repo by Ziad. We've enabled recovery from just 2 lenders.
+https://youtu.be/vmMPtxMcIEg
+

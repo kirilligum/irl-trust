@@ -90,6 +90,15 @@ We use ceramic to store loan contract term sheets. Modeled after ceramic's works
 In this video, when a borrower initiates a lending pool, the browser console logs the query string and sees it was successful as the streamID is shown. Through a query on the graphiql server we can also see that the new data was written to ceramic. This has little data but if this were to go to production, the lending pool would contain a lot more data that wouldn't make sense to store on Ethereum. Ceramic was a great option as it allowed quick access to read and write data supplementing on-chain data.
 https://youtu.be/7r-PXMzLgq8
 
+### Walletconnect
+Wallet connect enables our users to easily pick from a wide range of wallets they prefer. This allows the unbanked to use our personal lending protocol to put the oldest credit system on chain.
+
+### HUMA
+Huma's contracts are the backbone of our lending protocol. It helps evaluate risk and reputation, facilitate loans and repayments. 
+
+### USDC
+we use USDC for all loans as it's the simplest way to provide unit of measure. People don't want volatility in simple loans.
+
 ### Metamask
 Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. This was built on the Snappy recovery repo by Ziad. We've enabled recovery from just 2 lenders. With more time we would have liked to streamline the recovery process so that in our dapp's workflow, recovery can be set up automatically by default. 
 https://youtu.be/vmMPtxMcIEg

@@ -7,6 +7,9 @@ import { Head, MetaProps } from './Head'
 import { Account } from '..'
 import { Web3Button } from '@web3modal/react'
 import { useAccount } from 'wagmi'
+import Image from 'next/image'
+import irltLogo from '../../public/irl-trust-logo.jpg'
+
 // import { useCheckOwnership } from '../../hooks/useCheckOwnership'
 // import { CheckBadgeIcon, CheckCircleIcon, HomeIcon, InboxIcon, PaperAirplaneIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
 
@@ -38,11 +41,25 @@ export const Layout = ({ children, customMeta }) => {
 
 
       <div className="w-full container flex flex-col items-stretch" style={{ width: '40em' }}>
-        <h1 className="text-left py-4 text-6xl font-bold header m-0 w-full pb-4">
-          IRL-Trust
-        </h1>
-        <Web3Button />
-        {isConnected && <Account />}
+        <div className="flex flex-row ">
+          <Image
+            alt="Vercel logo"
+            src={irltLogo}
+            width={100}
+            height={100}
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+            }}
+          />
+          <h1 className="text-left py-4 text-6xl font-bold header mx-7 w-full pb-4">
+            IRL-Trust
+          </h1>
+        </div>
+        <div className="flex flex-row p-5 justify-between items-center">
+          {isConnected && <Account />}
+          <Web3Button />
+        </div>
         <div className='flex flex-row items-center content-center justify-center mb-6 '>
           <div className="cursor-pointer bg-blue-500 text-blue-300 self-center rounded-lg font-bold w-fit flex flex-row content-center h-12 overflow-hidden">
             <ActiveLink activeClassName="bg-blue-600 text-white" href="/" passHref>
@@ -59,13 +76,6 @@ export const Layout = ({ children, customMeta }) => {
               <div className="hover:text-white px-4 hover:bg-blue-600 flex flex-row items-center"><strong>loans</strong></div>
             </ActiveLink>
           </div>
-
-        </div>
-
-        <div className="bg-slate-800 p-4 rounded-md flex flex-col">
-          {/* <div>{`owns NFT: ${connectedOwnsNFT}`}</div> */}
-          {/* <ConnectButton /> */}
-
         </div>
         {children}
       </div>

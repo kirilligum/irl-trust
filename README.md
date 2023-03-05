@@ -87,10 +87,10 @@ to preset for web integration
 
 ### Ceramic
 We use ceramic to store loan contract term sheets. Modeled after ceramic's workshop, the ceramic2 submodule spins up a ceramic node plus a graphiql server. The run time composite enables the frontend to execute graphql queries. 
-In this video, when a borrower initiates a lending pool, the browser console logs the query string and sees it was successful as the streamID is shown. Through a query on the graphiql server we can also see that the new data was written to ceramic.
+In this video, when a borrower initiates a lending pool, the browser console logs the query string and sees it was successful as the streamID is shown. Through a query on the graphiql server we can also see that the new data was written to ceramic. This has little data but if this were to go to production, the lending pool would contain a lot more data that wouldn't make sense to store on Ethereum. Ceramic was a great option as it allowed quick access to read and write data supplementing on-chain data.
 https://youtu.be/7r-PXMzLgq8
 
 ### Metamask
-Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. This was built on the Snappy recovery repo by Ziad. We've enabled recovery from just 2 lenders.
+Social recovery is an important aspect for our users. Since our lending pools are people that know each other in real life, it's a great safety mechanism for our borrowers to get help from lenders for recovery. This was built on the Snappy recovery repo by Ziad. We've enabled recovery from just 2 lenders. With more time we would have liked to streamline the recovery process so that in our dapp's workflow, recovery can be set up automatically by default. 
 https://youtu.be/vmMPtxMcIEg
 

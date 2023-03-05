@@ -7,6 +7,7 @@ import { PoolForm } from '../components/PoolForm'
 // import { tw } from 'twind'
 import {
   useProposal,
+  usePool
 } from '../hooks/usePool'
 
 
@@ -15,6 +16,17 @@ import {
 const Borrow = () => {
   const [lendersIter, setLendersIter] = useState(1)
   const [pool, setPool] = useState(null)
+
+  const [poolAddr, setPoolAddr] = useState(JSON.parse(
+    localStorage.getItem("pool")
+  ).pool)
+  const {poolAmount, getPoolAmount, withdraw} = usePool(poolAddr)
+  const [lenders, setLenders] = useState([])
+  useEffect(() => {
+    if (poolAddr) {
+      getPoolAmount()
+    }
+  }, [poolAddr])
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 
@@ -27,7 +39,7 @@ const Borrow = () => {
   //   if (client) {
   //     setXMTPConnected(true)
   //   }
-  // }, [client])
+  // }, [client]
 
   var curr = new Date();
   curr.setDate(curr.getDate() + 3);
@@ -38,12 +50,27 @@ const Borrow = () => {
     setPool(pc)
   }
 
+  const lendersList = lenders.map((lender, i) => {
+    return (
+      <tr key={i}>
+        <td>lender.address</td>
+        <td>lender.message</td>
+        <td>lender.deposited</td>
+        <td>USDC</td>
+        <td>%60</td>
+        <td>lender.approved</td>
+      </tr>
+    )
+  })
+
   return (
     <Layout>
+      { !poolAddr && (
       <PoolForm
         handlePoolContract={handlePoolContract}
-      />
-        {pool && (<><div>URL: irl-trust.xyz/{poolContract.address}
+      />)
+        }
+        {poolAddr && (<><div>URL: irl-trust.xyz/{poolAddr}
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>
 
@@ -56,22 +83,6 @@ const Borrow = () => {
             <td>Token</td>
             <td>pool %</td>
             <td>approval</td>
-          </tr>
-          <tr>
-            <td>0xbe23..f34</td>
-            <td>this is your uncle, happy to help with starting your sewing business</td>
-            <td>12</td>
-            <td>USDC</td>
-            <td>%60</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>approve</button></td>
-          </tr>
-          <tr>
-            <td>0x12af..d78</td>
-            <td>this is a friend of your uncle</td>
-            <td>8</td>
-            <td>USDC</td>
-            <td>%40</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>approve</button></td>
           </tr>
         </table>
         total approvals: 0, total amount commited: 0
@@ -88,10 +99,12 @@ const Borrow = () => {
           <tr>
             <td>03/04/2023</td>
             <td>2</td>
-            <td>10</td>
+            <td>{poolAmount}</td>
             <td>USDC</td>
             <td>%50</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>withdraw</button></td>
+            <td><button
+              onClick={async () => { await withdraw() }}
+            className='p-2 rounded-xl bg-green-600'>withdraw</button></td>
           </tr>
           <tr>
             <td>03/11/2023</td>

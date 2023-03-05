@@ -16,17 +16,16 @@ function toToken(number) {
 async function deployContracts(
 ) {
   const [
-    defaultDeployer,
+    borrowerA,
+    lenderA,
+    lenderB,
+    borrowerB,
     poolOwner,
     poolOperator,
     poolOwnerTreasury,
     proxyOwner,
     treasury,
     evaluationAgent,
-    lenderA,
-    lenderB,
-    borrowerA,
-    borrowerB,
     protocolOwner,
     eaServiceAccount,
     pdsServiceAccount,
@@ -289,6 +288,56 @@ async function deployContracts(
   await poolConfigTwo.connect(poolOwner).setAPR(1217);
   await poolConfigTwo.connect(poolOwner).setMaxCreditLine(toToken(10_000_000));
   fs.writeFileSync('../src/public/Static.json', JSON.stringify({
+    addresses: {
+      poolOwner: poolOwner.address,
+      poolOperator: poolOperator.address,
+      poolOwnerTreasury: poolOwnerTreasury.address,
+      protocolOwner: protocolOwner.address,
+      eaServiceAccount: eaServiceAccount.address,
+      pdsServiceAccount: pdsServiceAccount.address,
+      evaluationAgent: evaluationAgent.address,
+      proxyOwner: proxyOwner.address,
+      lenderA: lenderA.address,
+      lenderB: lenderB.address,
+      borrowerA: borrowerA.address,
+      borrowerB: borrowerB.address
+    },
+    TestToken: {
+      address: testTokenContract.address,
+      abi: require('../artifacts/contracts/mock/TestToken.sol/TestToken.json').abi
+    },
+    PoolStarter: {
+      address: poolStarter.address,
+      abi: require('../artifacts/contracts/PoolStarter.sol/PoolStarter.json').abi
+    },
+    EaNFTContract: {
+      address: eaNFTContract.address,
+      abi: require('../artifacts/contracts/EvaluationAgentNFT.sol/EvaluationAgentNFT.json').abi
+    },
+    HumaConfig: {
+      address: humaConfigContract.address,
+      abi: require('../artifacts/contracts/HumaConfig.sol/HumaConfig.json').abi
+    },
+    BaseFeeManager: {
+      address: feeManagerContract.address,
+      abi: require('../artifacts/contracts/BaseFeeManager.sol/BaseFeeManager.json').abi
+    },
+    TransparentUpgradeableProxy: {
+      abi: require('../artifacts/@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json').abi,
+      bytecode: require('../artifacts/@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json').bytecode,
+    },
+    HDT: {
+      abi: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').abi,
+      bytecode: require('../artifacts/contracts/HDT/HDT.sol/HDT.json').bytecode,
+    },
+    PoolConfig: {
+      abi: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').abi,
+      bytecode: require('../artifacts/contracts/BasePoolConfig.sol/BasePoolConfig.json').bytecode,
+    },
+    BaseCreditPool: {
+      abi: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').abi,
+      bytecode: require('../artifacts/contracts/BaseCreditPool.sol/BaseCreditPool.json').bytecode,
+    },
     poolOne: {
       addressImpl: poolImplOne.address,
       addressProxy: poolProxyOne.address,
@@ -345,7 +394,6 @@ async function deployContracts(
     config: {humaConfigContract, feeManagerContract, testTokenContract, eaNFTContract},
     token: {testTokenContract},
     signers: {
-      defaultDeployer,
       proxyOwner,
       lenderA,
       lenderB,
@@ -359,7 +407,7 @@ async function deployContracts(
       pdsServiceAccount,
       poolOperator,
       poolOwnerTreasury,
-    }
+    },
   }
 }
 

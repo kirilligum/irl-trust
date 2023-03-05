@@ -1,0 +1,5 @@
+fastapi>=0.78.0
+pydantic>=1.9.1
+requests>=2.27.1
+uvicorn>=0.17.6
+web3>=5.29.2

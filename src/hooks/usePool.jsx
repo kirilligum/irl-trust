@@ -39,19 +39,23 @@ export const useProposal = () => {
   console.log('endDate', endDate)
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
-  const [aprInBps, setAprInBps]  = useState(30)
-  const [poolContract,setPoolContract] = useState(null)
-  const { data:signer, isError, isLoading } = useSigner()
+  const [aprInBps, setAprInBps] = useState(30)
+  const [poolContract, setPoolContract] = useState(null)
+  const { data: signer, isError, isLoading } = useSigner()
   const [repaymentStartDate, setRepaymentStartDate] = useState(new Date())
   const [repaymentEndDate, setRepaymentEndDate] = useState(new Date())
+
   const submitTerms = useCallback(async () => {
     let queryString = `
     mutation {
-      createIrl_Term_Sheet(input:{
+      createIrlTermsheet(input:{
         content:{
           PoolName: "${name}"
+          PoolAddress: "${poolContract}"
           TermsDescription: "${description}"
           AmountPerPeriod: "${maxWithdrawPerPeriod}"
+          WithdrawPeriodLength: "${withdrawPeriodLength}"
+          AuthorizedLenders: " ${lenders.join(', ')}"
           LoanPaidTo: "${loanPaidTo}"
           LoanEndDate: "${endDate}"
           APR: "${aprInBps * 100}"
@@ -74,9 +78,45 @@ export const useProposal = () => {
 
     const ts = await composeClient.executeQuery(queryString)
     console.log("ts: ", ts)
-  }, [name, description, maxWithdrawPerPeriod, loanPaidTo, endDate, aprInBps, repaymentEndDate, repaymentEndDate])
+  }, [name, description, maxWithdrawPerPeriod, loanPaidTo, endDate, aprInBps, repaymentEndDate, repaymentEndDate, poolContract])
 
-  const getTerms = useCallback(() => {
+
+  const getTerms = useCallback(async (_poolAddress) => {
+    console.log("PooolaAddress: ", _poolAddress)
+    let queryString = `
+    
+    query MyQuery {
+      irlTermsheetIndex(last: 50){
+        edges{
+          node{
+            PoolName
+            PoolAddress
+            TermsDescription
+            AmountPerPeriod
+            WithdrawPeriodLength
+            AuthorizedLenders
+            LoanPaidTo
+            LoanEndDate
+            APR
+            RepaymentStartDate
+            RepaymentEndDate
+            DefaultDays
+            URL
+          } 
+        }
+      }  
+    }
+    `
+    // console.log(queryString)
+
+    let results = await composeClient.executeQuery(queryString)
+    results = results.data.irlTermsheetIndex.edges
+    let match = results.filter(item => { return item.node.PoolAddress === _poolAddress })
+    match = match[0].node
+    console.log("results:", match)
+
+    return match
+
   }, [])
 
   const deployHDT = useCallback(async () => {
@@ -240,14 +280,14 @@ export const useProposal = () => {
     }
   }, [isConnected])
   return {
-    name:name,
-    setName:setName,
-    withdrawPeriodLength:withdrawPeriodLength,
+    name: name,
+    setName: setName,
+    withdrawPeriodLength: withdrawPeriodLength,
     setWithdrawPeriodLength: setWithdrawPeriodLength,
     maxWithdrawPerPeriod: maxWithdrawPerPeriod,
     setMaxWithdrawPerPeriod: setMaxWithdrawPerPeriod,
-    endDate:endDate,
-    setEndDate:setEndDate,
+    endDate: endDate,
+    setEndDate: setEndDate,
     lenders: lenders,
     setLenders: setLenders,
     intervalInDays: intervalInDays,

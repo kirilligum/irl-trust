@@ -271,7 +271,33 @@ export const usePool = (pool) => {
   const { address, isConnected } = useAccount()
   const { data:signer, isError, isLoading } = useSigner()
   const [amount, setAmount] = useState(0)
+  const [poolAmount, setPoolAmount] = useState(0)
 
+  const withdraw = useCallback(async () => {
+    if (!isLoading && !isError) {
+      const poolContract = new ethers.Contract(
+        pool,
+        Static.BaseCreditPool.abi,
+        signer
+      )
+      console.log(poolAmount)
+      console.log(Number(ethers.utils.parseUnits(String(1), 0)))
+      const res = await poolContract.withdraw(
+        ethers.utils.parseUnits(String(1),1)
+      )
+    }
+  }, [isLoading, isError, pool, poolAmount])
+  const getPoolAmount = useCallback(async () => {
+    if (!isLoading && !isError) {
+      const tokenContract = new ethers.Contract(
+        Static.TestToken.address,
+        Static.TestToken.abi,
+        signer
+      )
+      const res = await tokenContract.balanceOf(pool)
+      setPoolAmount(ethers.utils.formatUnits(res, 6))
+    }
+  })
   const approve = useCallback(async () => {
     if (!isLoading && !isError) {
       const tokenContract = new ethers.Contract(
@@ -286,7 +312,7 @@ export const usePool = (pool) => {
       )
       console.log(res)
     }
-  }, [isLoading, isError, amount])
+  }, [isLoading, isError, poolAmount, pool])
 
   const deposit = useCallback(async() => {
     if (!isLoading && !isError) {
@@ -312,6 +338,9 @@ export const usePool = (pool) => {
     deposit: deposit,
     approve: approve,
     amount: amount,
-    setAmount: setAmount
+    setAmount: setAmount,
+    poolAmount: poolAmount,
+    getPoolAmount: getPoolAmount,
+    withdraw: withdraw
   }
 }

@@ -7,6 +7,7 @@ import { PoolForm } from '../components/PoolForm'
 // import { tw } from 'twind'
 import {
   useProposal,
+  usePool
 } from '../hooks/usePool'
 
 
@@ -15,12 +16,17 @@ import {
 const Borrow = () => {
   const [lendersIter, setLendersIter] = useState(1)
   const [pool, setPool] = useState(null)
+
+  const [poolAddr, setPoolAddr] = useState(JSON.parse(
+    localStorage.getItem("pool")
+  ).pool)
+  const {poolAmount, getPoolAmount, withdraw} = usePool(poolAddr)
   const [lenders, setLenders] = useState([])
   useEffect(() => {
-    if (pool) {
-        
+    if (poolAddr) {
+      getPoolAmount()
     }
-  }, [pool])
+  }, [poolAddr])
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 
@@ -59,10 +65,12 @@ const Borrow = () => {
 
   return (
     <Layout>
+      { !poolAddr && (
       <PoolForm
         handlePoolContract={handlePoolContract}
-      />
-        {pool && (<><div>URL: irl-trust.xyz/{pool.address}
+      />)
+        }
+        {poolAddr && (<><div>URL: irl-trust.xyz/{poolAddr}
           <button className='p-2 bg-blue-600'>copy link</button>
         </div>
 
@@ -78,11 +86,6 @@ const Borrow = () => {
           </tr>
         </table>
         total approvals: 0, total amount commited: 0
-        <button
-          onClick={async () => {
-            await enablePool()
-          }}
-          className='p-2 bg-orange-600'>Initialize Pool</button>
         <h1>withdrawls</h1>
         <table>
           <tr>
@@ -96,10 +99,12 @@ const Borrow = () => {
           <tr>
             <td>03/04/2023</td>
             <td>2</td>
-            <td>10</td>
+            <td>{poolAmount}</td>
             <td>USDC</td>
             <td>%50</td>
-            <td><button className='p-2 rounded-xl bg-green-600'>withdraw</button></td>
+            <td><button
+              onClick={async () => { await withdraw() }}
+            className='p-2 rounded-xl bg-green-600'>withdraw</button></td>
           </tr>
           <tr>
             <td>03/11/2023</td>

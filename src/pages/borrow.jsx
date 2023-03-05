@@ -76,7 +76,6 @@ const Borrow = () => {
             <td>pool %</td>
             <td>approval</td>
           </tr>
-          { lendersList() }
         </table>
         total approvals: 0, total amount commited: 0
         <button

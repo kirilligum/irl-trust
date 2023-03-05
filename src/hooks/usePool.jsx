@@ -169,7 +169,7 @@ export const useProposal = () => {
       )
       await pool.deployed()
       console.log('pool deployed', pool)
-      return pool 
+      return {pool, poolProxy} 
     }
   }, [])
 
@@ -205,27 +205,34 @@ export const useProposal = () => {
     }
   }, [endDate, maxWithdrawPerPeriod, withdrawPeriodLength])
 
+  const enablePool = useCallback(async (poolAddr) => {
+    if (!isError && !isLoading) {
+      const poolStarter = new ethers.Contract(
+        Static.PoolStarter.address,
+        Static.PoolStarter.abi,
+        signer
+      )
+      const res = await poolStarter.enablePool(poolAddr)
+    }
+  }, [poolContract])
   const createPool = useCallback(async (
   ) => {
     console.log('enddate', endDate)
-
+    console.log('max', maxWithdrawPerPeriod)
     console.log('deploying hdt')
     const hdt = await deployHDT()
     console.log('deploying poolconfig')
     const poolConfig = await deployPoolConfig(hdt.address)
     console.log('deploying pool')
-    const pool = await deployPool(poolConfig.address)
+    const {pool, poolProxy} = await deployPool(poolConfig.address)
     console.log('configuring pool')
     await configurePool(endDate, pool, poolConfig, hdt)
+    await enablePool(pool.address)
     setPoolContract(pool)
+    localStorage.setItem("pool", JSON.stringify({pool: pool.address, poolProxy:poolProxy.address}))
     
   }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
 
-  const enablePool = useCallback(() => {
-    if (!isError && !isLoading) {
-
-    }
-  }, [poolContract])
 
   useEffect(() => {
     if (isConnected) {
@@ -260,21 +267,51 @@ export const useProposal = () => {
   }
 }
 
-export const usePoolA = () => {
+export const usePool = (pool) => {
   const { address, isConnected } = useAccount()
   const { data:signer, isError, isLoading } = useSigner()
-  const poolAContract = useContract({
-    address: Static.poolA.addressProxy,
-    abi: Static.poolA.abi
-  })
+  const [amount, setAmount] = useState(0)
+
+  const approve = useCallback(async () => {
+    if (!isLoading && !isError) {
+      const tokenContract = new ethers.Contract(
+        Static.TestToken.address,
+        Static.TestToken.abi,
+        signer
+      )
+      console.log(amount, pool)
+      const res = await tokenContract.approve(
+        pool,
+        ethers.utils.parseUnits(String(amount), '6')
+      )
+      console.log(res)
+    }
+  }, [isLoading, isError, amount])
+
+  const deposit = useCallback(async() => {
+    if (!isLoading && !isError) {
+      const poolContract = new ethers.Contract(
+        pool,
+        Static.BaseCreditPool.abi,
+        signer
+      )
+      console.log(poolContract)
+      const res = await poolContract.deposit(
+        ethers.utils.parseUnits(String(amount), '6')
+      )
+      console.log('res', res)
+    }
+  }, [isLoading, isError, signer, amount])
 
 
   useEffect(() => {
-    if (!isLoading && !isError) {
-      isApprovedLender()
-    }
 
   }, [isLoading, isError])
 
-  return { isApproved }
+  return {
+    deposit: deposit,
+    approve: approve,
+    amount: amount,
+    setAmount: setAmount
+  }
 }

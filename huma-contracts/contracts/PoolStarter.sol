@@ -9,7 +9,7 @@ contract PoolStarter {
     address pool
   ) public {
     address lender = msg.sender;
-    require(IPool(pool).isApprovedLender(lender), "Only an approved lender can start a pool");
+    //require(IPool(pool).isApprovedLender(lender), "Only an approved lender can start a pool");
     ICredit(pool).enableCreditPool();
     pools.push(pool);
     emit PoolStarter(pool, msg.sender);

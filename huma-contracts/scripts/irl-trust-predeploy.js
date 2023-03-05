@@ -17,16 +17,15 @@ function toToken(number) {
 async function deployContracts(
 ) {
   const [
-    defaultDeployer,
+    borrowerA,
+    lenderA,
+    lenderB,
     poolOwner,
     poolOperator,
     poolOwnerTreasury,
     proxyOwner,
     treasury,
     evaluationAgent,
-    lenderA,
-    lenderB,
-    borrowerA,
     borrowerB,
     protocolOwner,
     eaServiceAccount,

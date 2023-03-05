@@ -1,0 +1,3 @@
+[submodule "ceramic2"]
+	path = ceramic2
+	url = https://github.com/alinobrasil/ceramic2

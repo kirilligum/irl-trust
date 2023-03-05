@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Layout } from '../components/layout/Layout'
+import { Layout } from '../../components/layout/Layout'
 // import { Borrow } from '../components/Borrow'
 // import { Lend } from '../components/Lend'
-import { Head } from '../components/layout/Head'
+import { Head } from '../../components/layout/Head'
 import Link, { LinkProps } from 'next/link'
 
 
@@ -29,8 +29,8 @@ function Page() {
       <div className="flex flex-col">
         <h1>lens</h1>
         <div>username: jiji</div>
-        <div>sortest path: 0</div>
-        <div>score: </div>
+        <div>sortest path: me → Bill → Lydia → juju</div>
+        <div>score: 82.5</div>
         <h1>ongoing loans</h1>
         <table>
           <tr>
@@ -47,7 +47,7 @@ function Page() {
                 className='underline'
                 href="/users/juju" as="/users/juju">juju</Link>
             </td>
-            <td> me </td>
+            <td> jiji </td>
           </tr>
         </table>
         <h1>history</h1>

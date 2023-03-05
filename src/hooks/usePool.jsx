@@ -10,7 +10,7 @@ export const toBigNumber = (num) => {
 
   }
 
-} 
+}
 import Static from '../public/Static.json'
 
 import { useCeramicContext } from '../composedb/context'
@@ -46,14 +46,13 @@ export const useProposal = () => {
   const [maxWithdrawPerPeriod, setMaxWithdrawPerPeriod] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0])
-  console.log('endDate', endDate)
   const [lenders, setLenders] = useState([])
   const [intervalInDays, setIntervalInDays] = useState(12)
   const [aprInBps, setAprInBps] = useState(30)
   const [poolContract, setPoolContract] = useState(null)
   const { data: signer, isError, isLoading } = useSigner()
-  const [repaymentStartDate, setRepaymentStartDate] = useState(new Date())
-  const [repaymentEndDate, setRepaymentEndDate] = useState(new Date())
+  const [repaymentStartDate, setRepaymentStartDate] = useState(new Date().toISOString().split('T')[0])
+  const [repaymentEndDate, setRepaymentEndDate] = useState(new Date().toISOString().split('T')[0])
 
   const submitTerms = useCallback(async () => {
     let queryString = `
@@ -219,7 +218,7 @@ export const useProposal = () => {
       )
       await pool.deployed()
       console.log('pool deployed', pool)
-      return {pool, poolProxy} 
+      return { pool, poolProxy }
     }
   }, [])
 
@@ -273,12 +272,12 @@ export const useProposal = () => {
     console.log('deploying poolconfig')
     const poolConfig = await deployPoolConfig(hdt.address)
     console.log('deploying pool')
-    const {pool, poolProxy} = await deployPool(poolConfig.address)
+    const { pool, poolProxy } = await deployPool(poolConfig.address)
     console.log('configuring pool')
     await configurePool(endDate, pool, poolConfig, hdt)
     await enablePool(pool.address)
     setPoolContract(pool)
-    localStorage.setItem("pool", JSON.stringify({pool: pool.address, poolProxy:poolProxy.address}))
+    localStorage.setItem("pool", JSON.stringify({ pool: pool.address, poolProxy: poolProxy.address }))
   }, [endDate, lenders, maxWithdrawPerPeriod, withdrawPeriodLength, lenders])
 
 
@@ -306,6 +305,8 @@ export const useProposal = () => {
     getTerms: getTerms,
     createPool: createPool,
     poolContract: poolContract,
+    repaymentStartDate: repaymentStartDate,
+    setRepaymentStartDate: setRepaymentStartDate,
     repaymentEndDate: repaymentEndDate,
     setRepaymentEndDate: setRepaymentEndDate,
     loanPaidTo: loanPaidTo,
@@ -317,7 +318,7 @@ export const useProposal = () => {
 
 export const usePool = () => {
   const { address, isConnected } = useAccount()
-  const { data:signer, isError, isLoading } = useSigner()
+  const { data: signer, isError, isLoading } = useSigner()
   const [amount, setAmount] = useState(0)
   const [poolAmount, setPoolAmount] = useState(0)
 
@@ -343,7 +344,7 @@ export const usePool = () => {
       )
 
     }
-  }, [isLoading, isError  ])
+  }, [isLoading, isError])
   const drawdown = useCallback(async (pool) => {
     if (!isLoading && !isError) {
       const poolContract = new ethers.Contract(
@@ -385,7 +386,7 @@ export const usePool = () => {
     }
   }, [isLoading, isError, poolAmount, amount])
 
-  const deposit = useCallback(async(pool) => {
+  const deposit = useCallback(async (pool) => {
     if (!isLoading && !isError) {
       const poolContract = new ethers.Contract(
         pool,
@@ -394,7 +395,7 @@ export const usePool = () => {
       )
       console.log(poolContract)
       console.log('deposit', amount, toBigNumber(amount),
-      Number(toBigNumber(amount)))
+        Number(toBigNumber(amount)))
       const res = await poolContract.deposit(
         toBigNumber(amount)
       )

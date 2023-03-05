@@ -6,7 +6,7 @@ import { Layout } from '../components/layout/Layout'
 // import { tw } from 'twind'
 
 
-const Loans  = () => {
+const Loans = () => {
   // const { initClient, client } = useContext(XmtpContext)
   // let [xmtp_connected, setXMTPConnected] = useState(false)
 
@@ -45,12 +45,12 @@ const Loans  = () => {
             <td>action</td>
           </tr>
           <tr>
-            <td>75</td>
+            <td>82.5</td>
             <td>sewing</td>
             <td>link.xyz</td>
             <td>$20</td>
             <td>USDC</td>
-            <td>%0</td>
+            <td>%3</td>
             <td>
               <input className='w-32 text-black' name="desc" type="text" defaultValue={"it's your uncle's friend."} />
             </td>
@@ -61,11 +61,11 @@ const Loans  = () => {
           </tr>
           <tr>
             <td>75</td>
-            <td>sewing</td>
-            <td>link.xyz</td>
-            <td>$20</td>
+            <td>scooter</td>
+            <td>link2.xyz</td>
+            <td>$200</td>
             <td>USDC</td>
-            <td>%0</td>
+            <td>%4</td>
             <td>
             </td>
             <td>

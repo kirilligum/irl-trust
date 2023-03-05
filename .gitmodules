@@ -1,0 +1,6 @@
+[submodule "snappy-recovery"]
+	path = snappy-recovery
+	url = https://github.com/alinobrasil/irl-trust-snappy-recovery
+[submodule "ceramic2"]
+	path = ceramic2
+	url = git@github.com:alinobrasil/ceramic2.git

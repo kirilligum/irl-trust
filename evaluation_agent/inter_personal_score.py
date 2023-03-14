@@ -24,18 +24,24 @@ def weightedPathsSum(G,a,b):
     for i in G:
         ai=nx.dijkstra_path(G,a,i)
         ib = nx.dijkstra_path(G,i,b)
+        # print(ai,ib)
         path = ai[:-1]+ib
+        print(path)
         r = path[0]
         nc=1
         for j in path[1:]:
+            print("j",r,j,G[r][j]['weight'],nc)
             wedge= G[r][j]['weight']/len(path)/nc
+            print("wedges",wedge, G[r][j]['weight'],len(path),nc)
             if r!=j:
                 e.add_nodes_from([r,j])
                 e.add_edge(r,i,weight=wedge)
             r=j
             nc+=1
+    print('e',e.edges.data())
     ws=0
     for i in e.edges.data():
+        print(i,i[2]['weight'])
         ws+=i[2]['weight']
     return ws
 
@@ -50,8 +56,8 @@ def main(signer,borrower_addr):
     G=nx.Graph()
     for i in p:
         pool2edges(G,i,borrower_addr)
-    # print(G)
-    # print(G.adj)
+    print(G)
+    print(G.adj)
     print(weightedPathsSum(G,nsigner,nborrower))
     nx.draw_networkx(G)
     # nx.draw_networkx_edge_labels(G,pos=nx.spring_layout((G)))
